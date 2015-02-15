@@ -59,27 +59,38 @@ func NewChecker(devices []Device) Checker {
 func (c *Checker) Start() {
 	for _, device := range c.Devices {
 		if device.DevType == "bos" {
-			c.checkBos(device)
+			c.checkTcpPortLoop(device, 6922)
 		}
 	}
 }
 
-func (c *Checker) checkBos(device Device) {
+func (c *Checker) checkTcpPortLoop(device Device, port int) {
 	log.Println("Start check bos", device)
 	scheduledtask.NewScheduledTask(func() {
-		conn, err := net.Dial("tcp", fmt.Sprintf("%s:6922", device.Ip))
-		if err != nil {
-			log.Println("Check error", device)
-		} else {
+		if ok, err := c.checkTcpPort(device, port); ok {
 			log.Println("Check ok", device)
-			conn.Close()
+		} else {
+			log.Println("Check error", device, err)
 		}
-
 	}, 20*time.Second, 0)
 }
 
+func (c *Checker) checkTcpPort(device Device, port int) (bool, error) {
+	var err error
+	var conn net.Conn
+
+	for attempt := 0; attempt < 3; attempt++ {
+		conn, err = net.Dial("tcp", fmt.Sprintf("%s:%d", device.Ip, port))
+		if err == nil {
+			conn.Close()
+			return true, nil
+		}
+		time.Sleep(1 * time.Second)
+	}
+	return false, err
+}
+
 func main() {
-	log.Println("EFA")
 	devices, err := devicesFromInventory(os.Getenv("INVENTORY_FILE"))
 	if err != nil {
 		log.Panic(err)

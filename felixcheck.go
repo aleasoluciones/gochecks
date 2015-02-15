@@ -11,6 +11,11 @@ import (
 	"io/ioutil"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
+	"github.com/aleasoluciones/gosnmpquerier"
+)
+
+const (
+	sysName = "1.3.6.1.2.1.1.5.0"
 )
 
 type Device struct {
@@ -37,23 +42,28 @@ func devicesFromInventory(inventoryPath string) ([]Device, error) {
 		deviceMap := device.(map[string]interface{})
 		status := deviceMap["status"].(string)
 		if status == "Activo" {
-			devices = append(devices, Device{
+			device := Device{
 				DevType: deviceMap["dev_type"].(string),
 				Id:      deviceMap["id"].(string),
 				Ip:      deviceMap["ip"].(string),
-				//Community: deviceMap["snmp_rw"].(string),
-			})
+			}
+			community, ok := deviceMap["snmp_rw"]
+			if ok {
+				device.Community = community.(string)
+			}
+			devices = append(devices, device)
 		}
 	}
 	return devices, nil
 }
 
 type Checker struct {
-	Devices []Device
+	Devices     []Device
+	SnmpQuerier gosnmpquerier.SyncQuerier
 }
 
 func NewChecker(devices []Device) Checker {
-	return Checker{Devices: devices}
+	return Checker{Devices: devices, SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second)}
 }
 
 func (c *Checker) Start() {
@@ -61,16 +71,29 @@ func (c *Checker) Start() {
 		if device.DevType == "bos" {
 			c.checkTcpPortLoop(device, 6922)
 		}
+		if device.Community != "" {
+			c.checkSnmpLoop(device)
+		}
 	}
 }
 
+func (c *Checker) checkSnmpLoop(device Device) {
+	scheduledtask.NewScheduledTask(func() {
+		result, err := c.SnmpQuerier.Get(device.Ip, device.Community, []string{sysName}, 1*time.Second, 1)
+		if err == nil {
+			log.Println("Check snmp ok", device, result)
+		} else {
+			log.Println("Check snmp error", device, err)
+		}
+	}, 20*time.Second, 0)
+}
+
 func (c *Checker) checkTcpPortLoop(device Device, port int) {
-	log.Println("Start check bos", device)
 	scheduledtask.NewScheduledTask(func() {
 		if ok, err := c.checkTcpPort(device, port); ok {
-			log.Println("Check ok", device)
+			log.Println("Check tcp ok", device)
 		} else {
-			log.Println("Check error", device, err)
+			log.Println("Check tcp error", device, err)
 		}
 	}, 20*time.Second, 0)
 }
@@ -95,7 +118,6 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Println("devices", devices)
 	checker := NewChecker(devices)
 	checker.Start()
 

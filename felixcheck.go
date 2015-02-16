@@ -103,7 +103,7 @@ func (c *Checker) checkTcpPort(device Device, port int) (bool, error) {
 	var conn net.Conn
 
 	for attempt := 0; attempt < 3; attempt++ {
-		conn, err = net.Dial("tcp", fmt.Sprintf("%s:%d", device.Ip, port))
+		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", device.Ip, port), 2*time.Second)
 		if err == nil {
 			conn.Close()
 			return true, nil

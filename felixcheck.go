@@ -1,14 +1,10 @@
-package main
+package felixcheck
 
 import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"time"
-
-	"encoding/json"
-	"io/ioutil"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 	"github.com/aleasoluciones/gosnmpquerier"
@@ -23,38 +19,6 @@ type Device struct {
 	DevType   string
 	Ip        string
 	Community string
-}
-
-func devicesFromInventory(inventoryPath string) ([]Device, error) {
-	content, err := ioutil.ReadFile(inventoryPath)
-	if err != nil {
-		return []Device{}, err
-	}
-	var inventory interface{}
-	err = json.Unmarshal(content, &inventory)
-	if err != nil {
-		return []Device{}, err
-	}
-
-	devices := []Device{}
-
-	for _, device := range inventory.([]interface{}) {
-		deviceMap := device.(map[string]interface{})
-		status := deviceMap["status"].(string)
-		if status == "Activo" {
-			device := Device{
-				DevType: deviceMap["dev_type"].(string),
-				Id:      deviceMap["id"].(string),
-				Ip:      deviceMap["ip"].(string),
-			}
-			community, ok := deviceMap["snmp_rw"]
-			if ok {
-				device.Community = community.(string)
-			}
-			devices = append(devices, device)
-		}
-	}
-	return devices, nil
 }
 
 type Checker struct {
@@ -111,17 +75,4 @@ func (c *Checker) checkTcpPort(device Device, port int) (bool, error) {
 		time.Sleep(1 * time.Second)
 	}
 	return false, err
-}
-
-func main() {
-	devices, err := devicesFromInventory(os.Getenv("INVENTORY_FILE"))
-	if err != nil {
-		log.Panic(err)
-	}
-	checker := NewChecker(devices)
-	checker.Start()
-
-	for {
-		time.Sleep(2 * time.Second)
-	}
 }

@@ -2,7 +2,6 @@ package felixcheck
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"time"
 
@@ -21,53 +20,58 @@ type Device struct {
 	Community string
 }
 
-type Checker struct {
-	Devices     []Device
-	SnmpQuerier gosnmpquerier.SyncQuerier
+type CheckResult struct {
+	device  Device
+	checker Checker
+	result  bool
+	err     error
 }
 
-func NewChecker(devices []Device) Checker {
-	return Checker{Devices: devices, SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second)}
+type CheckEngine struct {
+	checkPublisher CheckPublisher
+	results        chan CheckResult
 }
 
-func (c *Checker) Start() {
-	for _, device := range c.Devices {
-		if device.DevType == "bos" {
-			c.checkTcpPortLoop(device, 6922)
+func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
+	checkEngine := CheckEngine{checkPublisher, make(chan CheckResult)}
+	go func() {
+		for result := range checkEngine.results {
+			checkEngine.checkPublisher.PublishCheckResult(result.device, result.checker, result.result, result.err)
 		}
-		if device.Community != "" {
-			c.checkSnmpLoop(device)
-		}
-	}
+	}()
+	return checkEngine
 }
 
-func (c *Checker) checkSnmpLoop(device Device) {
+func (ce CheckEngine) AddCheck(device Device, c Checker, period time.Duration) {
 	scheduledtask.NewScheduledTask(func() {
-		result, err := c.SnmpQuerier.Get(device.Ip, device.Community, []string{sysName}, 1*time.Second, 1)
-		if err == nil {
-			log.Println("Check snmp ok", device, result)
-		} else {
-			log.Println("Check snmp error", device, err)
-		}
-	}, 20*time.Second, 0)
+		result, err := c.Check(device)
+		ce.results <- CheckResult{device, c, result, err}
+
+	}, period, 0)
 }
 
-func (c *Checker) checkTcpPortLoop(device Device, port int) {
-	scheduledtask.NewScheduledTask(func() {
-		if ok, err := c.checkTcpPort(device, port); ok {
-			log.Println("Check tcp ok", device)
-		} else {
-			log.Println("Check tcp error", device, err)
-		}
-	}, 20*time.Second, 0)
+type CheckPublisher interface {
+	PublishCheckResult(device Device, checker Checker, result bool, err error)
 }
 
-func (c *Checker) checkTcpPort(device Device, port int) (bool, error) {
+type Checker interface {
+	Check(device Device) (bool, error)
+}
+
+type TcpPortChecker struct {
+	port int
+}
+
+func NewTcpPortChecker(port int) TcpPortChecker {
+	return TcpPortChecker{port: port}
+}
+
+func (c TcpPortChecker) Check(device Device) (bool, error) {
 	var err error
 	var conn net.Conn
 
 	for attempt := 0; attempt < 3; attempt++ {
-		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", device.Ip, port), 2*time.Second)
+		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", device.Ip, c.port), 2*time.Second)
 		if err == nil {
 			conn.Close()
 			return true, nil
@@ -75,4 +79,22 @@ func (c *Checker) checkTcpPort(device Device, port int) (bool, error) {
 		time.Sleep(1 * time.Second)
 	}
 	return false, err
+}
+
+type SnmpChecker struct {
+	SnmpQuerier gosnmpquerier.SyncQuerier
+}
+
+func NewSnmpChecker() SnmpChecker {
+	return SnmpChecker{SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second)}
+}
+
+func (c SnmpChecker) Check(device Device) (bool, error) {
+	_, err := c.SnmpQuerier.Get(device.Ip, device.Community, []string{sysName}, 1*time.Second, 1)
+	if err == nil {
+		return true, nil
+	} else {
+		return false, err
+	}
+
 }

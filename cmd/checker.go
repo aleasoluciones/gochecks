@@ -43,13 +43,31 @@ func devicesFromInventory(inventoryPath string) ([]felixcheck.Device, error) {
 	return devices, nil
 }
 
+type ConsoleLogPublisher struct {
+}
+
+func (c ConsoleLogPublisher) PublishCheckResult(device felixcheck.Device, checker felixcheck.Checker, result bool, err error) {
+	log.Println("Check ", device, checker, result, err)
+}
+
 func main() {
 	devices, err := devicesFromInventory(os.Getenv("INVENTORY_FILE"))
 	if err != nil {
 		log.Panic(err)
 	}
-	checker := felixcheck.NewChecker(devices)
-	checker.Start()
+
+	checkEngine := felixcheck.NewCheckEngine(ConsoleLogPublisher{})
+	snmpChecker := felixcheck.NewSnmpChecker()
+	tcpPortChecker := felixcheck.NewTcpPortChecker(6922)
+
+	for _, device := range devices {
+		if device.DevType == "bos" {
+			checkEngine.AddCheck(device, tcpPortChecker, 20*time.Second)
+		}
+		if device.Community != "" {
+			checkEngine.AddCheck(device, snmpChecker, 20*time.Second)
+		}
+	}
 
 	for {
 		time.Sleep(2 * time.Second)

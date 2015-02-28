@@ -58,7 +58,7 @@ func main() {
 
 	checkEngine := felixcheck.NewCheckEngine(ConsoleLogPublisher{})
 	snmpChecker := felixcheck.NewSnmpChecker()
-	tcpPortChecker := felixcheck.NewTcpPortChecker(6922)
+	tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)
 
 	for _, device := range devices {
 		if device.DevType == "bos" {

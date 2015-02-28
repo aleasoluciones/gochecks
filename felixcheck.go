@@ -58,25 +58,38 @@ type Checker interface {
 	Check(device Device) (bool, error)
 }
 
-type TcpPortChecker struct {
-	port int
+type TcpCheckerConf struct {
+	retries   int
+	timeout   time.Duration
+	retrytime time.Duration
 }
 
-func NewTcpPortChecker(port int) TcpPortChecker {
-	return TcpPortChecker{port: port}
+var DefaultTcpCheckConf = TcpCheckerConf{
+	retries:   3,
+	timeout:   2 * time.Second,
+	retrytime: 1 * time.Second,
+}
+
+type TcpPortChecker struct {
+	port int
+	conf TcpCheckerConf
+}
+
+func NewTcpPortChecker(port int, conf TcpCheckerConf) TcpPortChecker {
+	return TcpPortChecker{port: port, conf: conf}
 }
 
 func (c TcpPortChecker) Check(device Device) (bool, error) {
 	var err error
 	var conn net.Conn
 
-	for attempt := 0; attempt < 3; attempt++ {
-		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", device.Ip, c.port), 2*time.Second)
+	for attempt := 0; attempt < c.conf.retries; attempt++ {
+		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", device.Ip, c.port), c.conf.timeout)
 		if err == nil {
 			conn.Close()
 			return true, nil
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(c.conf.retrytime)
 	}
 	return false, err
 }

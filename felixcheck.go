@@ -94,16 +94,29 @@ func (c TcpPortChecker) Check(device Device) (bool, error) {
 	return false, err
 }
 
-type SnmpChecker struct {
-	SnmpQuerier gosnmpquerier.SyncQuerier
+type SnmpCheckerConf struct {
+	retries    int
+	timeout    time.Duration
+	oidToCheck string
 }
 
-func NewSnmpChecker() SnmpChecker {
-	return SnmpChecker{SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second)}
+var DefaultSnmpCheckConf = SnmpCheckerConf{
+	retries:    1,
+	timeout:    1 * time.Second,
+	oidToCheck: sysName,
+}
+
+type SnmpChecker struct {
+	SnmpQuerier gosnmpquerier.SyncQuerier
+	conf        SnmpCheckerConf
+}
+
+func NewSnmpChecker(conf SnmpCheckerConf) SnmpChecker {
+	return SnmpChecker{SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second), conf: conf}
 }
 
 func (c SnmpChecker) Check(device Device) (bool, error) {
-	_, err := c.SnmpQuerier.Get(device.Ip, device.Community, []string{sysName}, 1*time.Second, 1)
+	_, err := c.SnmpQuerier.Get(device.Ip, device.Community, []string{c.conf.oidToCheck}, c.conf.timeout, c.conf.retries)
 	if err == nil {
 		return true, nil
 	} else {

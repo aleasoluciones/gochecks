@@ -57,12 +57,15 @@ func main() {
 	}
 
 	checkEngine := felixcheck.NewCheckEngine(ConsoleLogPublisher{})
+	pingChecker := felixcheck.NewICMPChecker()
 	snmpChecker := felixcheck.NewSnmpChecker(felixcheck.DefaultSnmpCheckConf)
 	tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)
 
 	for _, device := range devices {
 		if device.DevType == "bos" {
 			checkEngine.AddCheck(device, tcpPortChecker, 20*time.Second)
+		} else {
+			checkEngine.AddCheck(device, pingChecker, 20*time.Second)
 		}
 		if device.Community != "" {
 			checkEngine.AddCheck(device, snmpChecker, 20*time.Second)

@@ -7,10 +7,12 @@ import (
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 	"github.com/aleasoluciones/gosnmpquerier"
+	"github.com/tatsushid/go-fastping"
 )
 
 const (
-	sysName = "1.3.6.1.2.1.1.5.0"
+	sysName     = "1.3.6.1.2.1.1.5.0"
+	maxPingTime = 4 * time.Second
 )
 
 type Device struct {
@@ -92,6 +94,43 @@ func (c TcpPortChecker) Check(device Device) (bool, error) {
 		time.Sleep(c.conf.retrytime)
 	}
 	return false, err
+}
+
+type ICMPChecker struct {
+}
+
+func NewICMPChecker() ICMPChecker {
+	return ICMPChecker{}
+}
+
+func (c ICMPChecker) String() string {
+	return "ICMPChecker"
+}
+
+func (c ICMPChecker) Check(device Device) (bool, error) {
+	var retRtt time.Duration = 0
+	var isUp bool = false
+
+	p := fastping.NewPinger()
+	p.MaxRTT = maxPingTime
+	ra, err := net.ResolveIPAddr("ip4:icmp", device.Ip)
+
+	if err != nil {
+		return false, err
+	}
+
+	p.AddIPAddr(ra)
+	p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
+		isUp = true
+		retRtt = rtt
+	}
+
+	err = p.Run()
+	if err != nil {
+		return false, err
+	}
+
+	return isUp, nil
 }
 
 type SnmpCheckerConf struct {

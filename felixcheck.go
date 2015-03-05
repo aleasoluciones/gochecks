@@ -81,6 +81,10 @@ func NewTcpPortChecker(port int, conf TcpCheckerConf) TcpPortChecker {
 	return TcpPortChecker{port: port, conf: conf}
 }
 
+func (c TcpPortChecker) String() string {
+	return fmt.Sprintf("TcpPortChecker %d", c.port)
+}
+
 func (c TcpPortChecker) Check(device Device) (bool, error) {
 	var err error
 	var conn net.Conn
@@ -152,6 +156,10 @@ type SnmpChecker struct {
 
 func NewSnmpChecker(conf SnmpCheckerConf) SnmpChecker {
 	return SnmpChecker{SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second), conf: conf}
+}
+
+func (c SnmpChecker) String() string {
+	return "SNMPChecker"
 }
 
 func (c SnmpChecker) Check(device Device) (bool, error) {

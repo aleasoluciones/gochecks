@@ -72,12 +72,12 @@ func main() {
 
 	for _, device := range devices {
 		if device.DevType == "bos" {
-			checkEngine.AddCheck(device, tcpPortChecker, 20*time.Second)
+			checkEngine.AddCheck(device, tcpPortChecker, "tcpport", 20*time.Second)
 		} else {
-			checkEngine.AddCheck(device, pingChecker, 20*time.Second)
+			checkEngine.AddCheck(device, pingChecker, "ping", 20*time.Second)
 		}
 		if device.Community != "" {
-			checkEngine.AddCheck(device, snmpChecker, 20*time.Second)
+			checkEngine.AddCheck(device, snmpChecker, "snmp", 20*time.Second)
 		}
 	}
 

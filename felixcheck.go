@@ -33,16 +33,15 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	return p
 }
 
-func (p RabbitMqPublisher) PublishCheckResult(device Device, checker Checker, result bool, err error) {
+func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
 	var state string
-	if result == true {
+	if result.result == true {
 		state = "ok"
 	} else {
 		state = "critical"
 	}
-	topic := fmt.Sprintf("check.%s.%s", checker, device.Id)
-	service := fmt.Sprintf("%s", checker)
-	serialized, _ := json.Marshal(CheckResultMessage{device.Id, service, state})
+	topic := fmt.Sprintf("check.%s.%s", result.checker, result.device.Id)
+	serialized, _ := json.Marshal(CheckResultMessage{result.device.Id, result.service, state})
 	p.publisher.Publish(topic, serialized)
 }
 
@@ -56,6 +55,7 @@ type Device struct {
 type CheckResult struct {
 	device  Device
 	checker Checker
+	service string
 	result  bool
 	err     error
 }
@@ -69,22 +69,22 @@ func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
 	checkEngine := CheckEngine{checkPublisher, make(chan CheckResult)}
 	go func() {
 		for result := range checkEngine.results {
-			checkEngine.checkPublisher.PublishCheckResult(result.device, result.checker, result.result, result.err)
+			checkEngine.checkPublisher.PublishCheckResult(result)
 		}
 	}()
 	return checkEngine
 }
 
-func (ce CheckEngine) AddCheck(device Device, c Checker, period time.Duration) {
+func (ce CheckEngine) AddCheck(device Device, c Checker, service string, period time.Duration) {
 	scheduledtask.NewScheduledTask(func() {
 		result, err := c.Check(device)
-		ce.results <- CheckResult{device, c, result, err}
+		ce.results <- CheckResult{device, c, service, result, err}
 
 	}, period, 0)
 }
 
 type CheckPublisher interface {
-	PublishCheckResult(device Device, checker Checker, result bool, err error)
+	PublishCheckResult(result CheckResult)
 }
 
 type Checker interface {

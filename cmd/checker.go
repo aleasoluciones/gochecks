@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"time"
@@ -56,7 +57,15 @@ func main() {
 		log.Panic(err)
 	}
 
-	checkEngine := felixcheck.NewCheckEngine(ConsoleLogPublisher{})
+	var amqpuri, exchange string
+
+	flag.StringVar(&amqpuri, "amqpuri", "amqp://guest:guest@localhost/", "AMQP connection uri")
+	flag.StringVar(&exchange, "exchange", "events", "AMQP exchange")
+	flag.Parse()
+
+	publisher := felixcheck.NewRabbitMqPublisher(amqpuri, exchange)
+
+	checkEngine := felixcheck.NewCheckEngine(publisher)
 	pingChecker := felixcheck.NewICMPChecker()
 	snmpChecker := felixcheck.NewSnmpChecker(felixcheck.DefaultSnmpCheckConf)
 	tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)

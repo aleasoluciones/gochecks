@@ -5,8 +5,11 @@ import (
 	"net"
 	"time"
 
+	"encoding/json"
+
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 	"github.com/aleasoluciones/gosnmpquerier"
+	"github.com/aleasoluciones/simpleamqp"
 	"github.com/tatsushid/go-fastping"
 )
 
@@ -14,6 +17,34 @@ const (
 	sysName     = "1.3.6.1.2.1.1.5.0"
 	maxPingTime = 4 * time.Second
 )
+
+type CheckResultMessage struct {
+	Host    string `json:"host"`
+	Service string `json:"service"`
+	State   string `json:"state"`
+}
+
+type RabbitMqPublisher struct {
+	publisher *simpleamqp.AmqpPublisher
+}
+
+func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
+	p := RabbitMqPublisher{simpleamqp.NewAmqpPublisher(amqpuri, exchange)}
+	return p
+}
+
+func (p RabbitMqPublisher) PublishCheckResult(device Device, checker Checker, result bool, err error) {
+	var state string
+	if result == true {
+		state = "ok"
+	} else {
+		state = "critical"
+	}
+	topic := fmt.Sprintf("check.%s.%s", checker, device.Id)
+	service := fmt.Sprintf("%s", checker)
+	serialized, _ := json.Marshal(CheckResultMessage{device.Id, service, state})
+	p.publisher.Publish(topic, serialized)
+}
 
 type Device struct {
 	Id        string

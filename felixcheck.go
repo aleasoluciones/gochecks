@@ -2,7 +2,10 @@ package felixcheck
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net"
+	"net/http"
+	"os"
 	"time"
 
 	"encoding/json"
@@ -129,6 +132,34 @@ func (c TcpPortChecker) Check(device Device) (bool, error) {
 		time.Sleep(c.conf.retrytime)
 	}
 	return false, err
+}
+
+type HttpChecker struct {
+	url string
+}
+
+func NewHttpChecker(url string) HttpChecker {
+	return HttpChecker{url: url}
+}
+
+func (c HttpChecker) String() string {
+	return fmt.Sprintf("HttpChecker %s", c.url)
+}
+
+func (c HttpChecker) Check(device Device) (bool, error) {
+	response, err := http.Get(c.url)
+	if err != nil {
+		return false, err
+	} else {
+		defer response.Body.Close()
+		contents, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			fmt.Printf("%s", err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s\n", string(contents))
+	}
+	return true, err
 }
 
 type ICMPChecker struct {

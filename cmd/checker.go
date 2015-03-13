@@ -69,6 +69,7 @@ func main() {
 	pingChecker := felixcheck.NewICMPChecker()
 	snmpChecker := felixcheck.NewSnmpChecker(felixcheck.DefaultSnmpCheckConf)
 	tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)
+	httpChecker := felixcheck.NewHttpChecker("http://golang.org/")
 
 	for _, device := range devices {
 		if device.DevType == "bos" {
@@ -79,6 +80,7 @@ func main() {
 		if device.Community != "" {
 			checkEngine.AddCheck(device, snmpChecker, "snmp", 20*time.Second)
 		}
+		checkEngine.AddCheck(device, httpChecker, "http", 30*time.Second)
 	}
 
 	for {

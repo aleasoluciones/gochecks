@@ -2,13 +2,12 @@ package felixcheck
 
 import (
 	"fmt"
-	"io/ioutil"
+	"log"
 	"net"
-	"net/http"
-	"os"
 	"time"
 
-	"encoding/json"
+	//"encoding/json"
+	"net/http"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 	"github.com/aleasoluciones/gosnmpquerier"
@@ -36,28 +35,7 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	return p
 }
 
-func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
-	var state string
-	if result.result == true {
-		state = "ok"
-	} else {
-		state = "critical"
-	}
-	topic := fmt.Sprintf("check.%s.%s", result.checker, result.device.Id)
-	serialized, _ := json.Marshal(CheckResultMessage{result.device.Id, result.service, state})
-	p.publisher.Publish(topic, serialized)
-}
-
-type Device struct {
-	Id        string
-	DevType   string
-	Ip        string
-	Community string
-}
-
 type CheckResult struct {
-	device  Device
-	checker Checker
 	service string
 	result  bool
 	err     error
@@ -78,11 +56,10 @@ func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
 	return checkEngine
 }
 
-func (ce CheckEngine) AddCheck(device Device, c Checker, service string, period time.Duration) {
+func (ce CheckEngine) AddCheck(host, service string, period time.Duration, check CheckFunction) {
 	scheduledtask.NewScheduledTask(func() {
-		result, err := c.Check(device)
-		ce.results <- CheckResult{device, c, service, result, err}
-
+		result, err := check()
+		log.Println("Result", host, service, result, err)
 	}, period, 0)
 }
 
@@ -90,8 +67,46 @@ type CheckPublisher interface {
 	PublishCheckResult(result CheckResult)
 }
 
-type Checker interface {
-	Check(device Device) (bool, error)
+func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
+	// var state string
+	// if result.result == true {
+	// 	state = "ok"
+	// } else {
+	// 	state = "critical"
+	// }
+	// topic := fmt.Sprintf("check.%s.%s", result.checker, result.device.Id)
+	// serialized, _ := json.Marshal(CheckResultMessage{result.device.Id, result.service, state})
+	// p.publisher.Publish(topic, serialized)
+}
+
+type CheckFunction func() (bool, error)
+
+func NewPingCheck(ip string) CheckFunction {
+	return func() (bool, error) {
+		var retRtt time.Duration = 0
+		var isUp bool = false
+
+		p := fastping.NewPinger()
+		p.MaxRTT = maxPingTime
+		ra, err := net.ResolveIPAddr("ip4:icmp", ip)
+
+		if err != nil {
+			return false, err
+		}
+
+		p.AddIPAddr(ra)
+		p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
+			isUp = true
+			retRtt = rtt
+		}
+
+		err = p.Run()
+		if err != nil {
+			return false, err
+		}
+
+		return isUp, nil
+	}
 }
 
 type TcpCheckerConf struct {
@@ -106,97 +121,36 @@ var DefaultTcpCheckConf = TcpCheckerConf{
 	retrytime: 1 * time.Second,
 }
 
-type TcpPortChecker struct {
-	port int
-	conf TcpCheckerConf
-}
+func NewTcpPortChecker(ip string, port int, conf TcpCheckerConf) CheckFunction {
+	return func() (bool, error) {
+		var err error
+		var conn net.Conn
 
-func NewTcpPortChecker(port int, conf TcpCheckerConf) TcpPortChecker {
-	return TcpPortChecker{port: port, conf: conf}
-}
-
-func (c TcpPortChecker) String() string {
-	return fmt.Sprintf("TcpPortChecker %d", c.port)
-}
-
-func (c TcpPortChecker) Check(device Device) (bool, error) {
-	var err error
-	var conn net.Conn
-
-	for attempt := 0; attempt < c.conf.retries; attempt++ {
-		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", device.Ip, c.port), c.conf.timeout)
-		if err == nil {
-			conn.Close()
-			return true, nil
+		for attempt := 0; attempt < conf.retries; attempt++ {
+			conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), conf.timeout)
+			if err == nil {
+				conn.Close()
+				return true, nil
+			}
+			time.Sleep(conf.retrytime)
 		}
-		time.Sleep(c.conf.retrytime)
-	}
-	return false, err
-}
-
-type HttpChecker struct {
-	url string
-}
-
-func NewHttpChecker(url string) HttpChecker {
-	return HttpChecker{url: url}
-}
-
-func (c HttpChecker) String() string {
-	return fmt.Sprintf("HttpChecker %s", c.url)
-}
-
-func (c HttpChecker) Check(device Device) (bool, error) {
-	response, err := http.Get(c.url)
-	if err != nil {
 		return false, err
-	} else {
-		defer response.Body.Close()
-		contents, err := ioutil.ReadAll(response.Body)
+	}
+}
+
+func NewHttpChecker(url string, expectedStatusCode int) CheckFunction {
+	return func() (bool, error) {
+		response, err := http.Get(url)
 		if err != nil {
-			fmt.Printf("%s", err)
-			os.Exit(1)
+			return false, err
+		} else {
+			defer response.Body.Close()
+			if response.StatusCode == expectedStatusCode {
+				return true, nil
+			}
 		}
-		fmt.Printf("%s\n", string(contents))
-	}
-	return true, err
-}
-
-type ICMPChecker struct {
-}
-
-func NewICMPChecker() ICMPChecker {
-	return ICMPChecker{}
-}
-
-func (c ICMPChecker) String() string {
-	return "ICMPChecker"
-}
-
-func (c ICMPChecker) Check(device Device) (bool, error) {
-	var retRtt time.Duration = 0
-	var isUp bool = false
-
-	p := fastping.NewPinger()
-	p.MaxRTT = maxPingTime
-	ra, err := net.ResolveIPAddr("ip4:icmp", device.Ip)
-
-	if err != nil {
 		return false, err
 	}
-
-	p.AddIPAddr(ra)
-	p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
-		isUp = true
-		retRtt = rtt
-	}
-
-	err = p.Run()
-	if err != nil {
-		return false, err
-	}
-
-	return isUp, nil
 }
 
 type SnmpCheckerConf struct {
@@ -211,25 +165,13 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 	oidToCheck: sysName,
 }
 
-type SnmpChecker struct {
-	SnmpQuerier gosnmpquerier.SyncQuerier
-	conf        SnmpCheckerConf
-}
-
-func NewSnmpChecker(conf SnmpCheckerConf) SnmpChecker {
-	return SnmpChecker{SnmpQuerier: gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second), conf: conf}
-}
-
-func (c SnmpChecker) String() string {
-	return "SNMPChecker"
-}
-
-func (c SnmpChecker) Check(device Device) (bool, error) {
-	_, err := c.SnmpQuerier.Get(device.Ip, device.Community, []string{c.conf.oidToCheck}, c.conf.timeout, c.conf.retries)
-	if err == nil {
-		return true, nil
-	} else {
-		return false, err
+func NewSnmpChecker(ip, community string, conf SnmpCheckerConf, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
+	return func() (bool, error) {
+		_, err := snmpQuerier.Get(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
+		if err == nil {
+			return true, nil
+		} else {
+			return false, err
+		}
 	}
-
 }

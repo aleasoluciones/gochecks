@@ -10,26 +10,34 @@ import (
 	"io/ioutil"
 
 	"github.com/aleasoluciones/felixcheck"
+	"github.com/aleasoluciones/gosnmpquerier"
 )
 
-func devicesFromInventory(inventoryPath string) ([]felixcheck.Device, error) {
+type Device struct {
+	Id        string
+	DevType   string
+	Ip        string
+	Community string
+}
+
+func devicesFromInventory(inventoryPath string) ([]Device, error) {
 	content, err := ioutil.ReadFile(inventoryPath)
 	if err != nil {
-		return []felixcheck.Device{}, err
+		return []Device{}, err
 	}
 	var inventory interface{}
 	err = json.Unmarshal(content, &inventory)
 	if err != nil {
-		return []felixcheck.Device{}, err
+		return []Device{}, err
 	}
 
-	devices := []felixcheck.Device{}
+	devices := []Device{}
 
 	for _, device := range inventory.([]interface{}) {
 		deviceMap := device.(map[string]interface{})
 		status := deviceMap["status"].(string)
 		if status == "Activo" {
-			device := felixcheck.Device{
+			device := Device{
 				DevType: deviceMap["dev_type"].(string),
 				Id:      deviceMap["id"].(string),
 				Ip:      deviceMap["ip"].(string),
@@ -47,10 +55,6 @@ func devicesFromInventory(inventoryPath string) ([]felixcheck.Device, error) {
 type ConsoleLogPublisher struct {
 }
 
-func (c ConsoleLogPublisher) PublishCheckResult(device felixcheck.Device, checker felixcheck.Checker, result bool, err error) {
-	log.Println("Check ", device, checker, result, err)
-}
-
 func main() {
 	devices, err := devicesFromInventory(os.Getenv("INVENTORY_FILE"))
 	if err != nil {
@@ -66,22 +70,26 @@ func main() {
 	publisher := felixcheck.NewRabbitMqPublisher(amqpuri, exchange)
 
 	checkEngine := felixcheck.NewCheckEngine(publisher)
-	pingChecker := felixcheck.NewICMPChecker()
-	snmpChecker := felixcheck.NewSnmpChecker(felixcheck.DefaultSnmpCheckConf)
-	tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)
-	httpChecker := felixcheck.NewHttpChecker("http://golang.org/")
+	// pingChecker := felixcheck.NewICMPChecker()
+	// snmpChecker := felixcheck.NewSnmpChecker(felixcheck.DefaultSnmpCheckConf)
+	// tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)
+	// httpChecker := felixcheck.NewHttpChecker("http://golang.org/")
+	snmpQuerier := gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second)
 
 	for _, device := range devices {
 		if device.DevType == "bos" {
-			checkEngine.AddCheck(device, tcpPortChecker, "tcpport", 20*time.Second)
+			checkEngine.AddCheck(device.Id, "tcport", 20*time.Second,
+				felixcheck.NewTcpPortChecker(device.Ip, 6922, felixcheck.DefaultTcpCheckConf))
 		} else {
-			checkEngine.AddCheck(device, pingChecker, "ping", 20*time.Second)
+			checkEngine.AddCheck(device.Id, "ping", 20*time.Second, felixcheck.NewPingCheck(device.Ip))
 		}
+
 		if device.Community != "" {
-			checkEngine.AddCheck(device, snmpChecker, "snmp", 20*time.Second)
+			checkEngine.AddCheck(device.Id, "snmp", 20*time.Second,
+				felixcheck.NewSnmpChecker(device.Ip, device.Community, felixcheck.DefaultSnmpCheckConf, snmpQuerier))
 		}
-		checkEngine.AddCheck(device, httpChecker, "http", 30*time.Second)
 	}
+	checkEngine.AddCheck("golang", "http", 30*time.Second, felixcheck.NewHttpChecker("http://golang.org/", 200))
 
 	for {
 		time.Sleep(2 * time.Second)

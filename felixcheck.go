@@ -2,11 +2,10 @@ package felixcheck
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"time"
 
-	//"encoding/json"
+	"encoding/json"
 	"net/http"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
@@ -36,6 +35,7 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 }
 
 type CheckResult struct {
+	host    string
 	service string
 	result  bool
 	err     error
@@ -59,7 +59,7 @@ func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
 func (ce CheckEngine) AddCheck(host, service string, period time.Duration, check CheckFunction) {
 	scheduledtask.NewScheduledTask(func() {
 		result, err := check()
-		log.Println("Result", host, service, result, err)
+		ce.results <- CheckResult{host, service, result, err}
 	}, period, 0)
 }
 
@@ -68,15 +68,15 @@ type CheckPublisher interface {
 }
 
 func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
-	// var state string
-	// if result.result == true {
-	// 	state = "ok"
-	// } else {
-	// 	state = "critical"
-	// }
-	// topic := fmt.Sprintf("check.%s.%s", result.checker, result.device.Id)
-	// serialized, _ := json.Marshal(CheckResultMessage{result.device.Id, result.service, state})
-	// p.publisher.Publish(topic, serialized)
+	var state string
+	if result.result == true {
+		state = "ok"
+	} else {
+		state = "critical"
+	}
+	topic := fmt.Sprintf("check.%s.%s", result.service, result.host)
+	serialized, _ := json.Marshal(CheckResultMessage{result.host, result.service, state})
+	p.publisher.Publish(topic, serialized)
 }
 
 type CheckFunction func() (bool, error)

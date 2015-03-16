@@ -70,16 +70,12 @@ func main() {
 	publisher := felixcheck.NewRabbitMqPublisher(amqpuri, exchange)
 
 	checkEngine := felixcheck.NewCheckEngine(publisher)
-	// pingChecker := felixcheck.NewICMPChecker()
-	// snmpChecker := felixcheck.NewSnmpChecker(felixcheck.DefaultSnmpCheckConf)
-	// tcpPortChecker := felixcheck.NewTcpPortChecker(6922, felixcheck.DefaultTcpCheckConf)
-	// httpChecker := felixcheck.NewHttpChecker("http://golang.org/")
 	snmpQuerier := gosnmpquerier.NewSyncQuerier(1, 1, 4*time.Second)
 
 	for _, device := range devices {
 		if device.DevType == "bos" {
-			checkEngine.AddCheck(device.Id, "tcport", 20*time.Second,
-				felixcheck.NewTcpPortChecker(device.Ip, 6922, felixcheck.DefaultTcpCheckConf))
+			checkEngine.AddCheck(device.Id, "tcport", 20*time.Second, felixcheck.NewTcpPortChecker(device.Ip, 6922, felixcheck.DefaultTcpCheckConf))
+			checkEngine.AddCheck(device.Id, "ping", 20*time.Second, felixcheck.NewPingCheck(device.Ip))
 		} else {
 			checkEngine.AddCheck(device.Id, "ping", 20*time.Second, felixcheck.NewPingCheck(device.Ip))
 		}

@@ -16,10 +16,10 @@ const (
 	maxPingTime = 4 * time.Second
 )
 
-type CheckFunction func() (bool, error, int64)
+type CheckFunction func() (bool, error, float32)
 
 func NewPingCheck(ip string) CheckFunction {
-	return func() (bool, error, int64) {
+	return func() (bool, error, float32) {
 		var retRtt time.Duration = 0
 		var isUp bool = false
 
@@ -59,7 +59,7 @@ var DefaultTcpCheckConf = TcpCheckerConf{
 }
 
 func NewTcpPortChecker(ip string, port int, conf TcpCheckerConf) CheckFunction {
-	return func() (bool, error, int64) {
+	return func() (bool, error, float32) {
 		var err error
 		var conn net.Conn
 
@@ -76,7 +76,7 @@ func NewTcpPortChecker(ip string, port int, conf TcpCheckerConf) CheckFunction {
 }
 
 func NewHttpChecker(url string, expectedStatusCode int) CheckFunction {
-	return func() (bool, error, int64) {
+	return func() (bool, error, float32) {
 		response, err := http.Get(url)
 		if err != nil {
 			return false, err, 0
@@ -103,7 +103,7 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 }
 
 func NewSnmpChecker(ip, community string, conf SnmpCheckerConf, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
-	return func() (bool, error, int64) {
+	return func() (bool, error, float32) {
 		_, err := snmpQuerier.Get(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
 		if err == nil {
 			return true, nil, 0

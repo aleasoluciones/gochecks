@@ -10,10 +10,10 @@ import (
 )
 
 type CheckResultMessage struct {
-	Host    string `json:"host"`
-	Service string `json:"service"`
-	State   string `json:"state"`
-	Metric  int64  `json:"metric"`
+	Host    string  `json:"host"`
+	Service string  `json:"service"`
+	State   string  `json:"state"`
+	Metric  float32 `json:"metric"`
 }
 
 type CheckResult struct {
@@ -21,7 +21,7 @@ type CheckResult struct {
 	service string
 	result  bool
 	err     error
-	metric  int64
+	metric  float32
 }
 
 type CheckEngine struct {

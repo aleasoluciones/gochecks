@@ -13,6 +13,7 @@ type CheckResultMessage struct {
 	Host    string `json:"host"`
 	Service string `json:"service"`
 	State   string `json:"state"`
+	Metric  int64  `json:"metric"`
 }
 
 type CheckResult struct {
@@ -20,6 +21,7 @@ type CheckResult struct {
 	service string
 	result  bool
 	err     error
+	metric  int64
 }
 
 type CheckEngine struct {
@@ -39,8 +41,8 @@ func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
 
 func (ce CheckEngine) AddCheck(host, service string, period time.Duration, check CheckFunction) {
 	scheduledtask.NewScheduledTask(func() {
-		result, err := check()
-		ce.results <- CheckResult{host, service, result, err}
+		result, err, metric := check()
+		ce.results <- CheckResult{host, service, result, err, metric}
 	}, period, 0)
 }
 
@@ -56,6 +58,6 @@ func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
 		state = "critical"
 	}
 	topic := fmt.Sprintf("check.%s.%s", result.service, result.host)
-	serialized, _ := json.Marshal(CheckResultMessage{result.host, result.service, state})
+	serialized, _ := json.Marshal(CheckResultMessage{result.host, result.service, state, result.metric})
 	p.publisher.Publish(topic, serialized)
 }

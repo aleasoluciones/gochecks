@@ -16,10 +16,10 @@ const (
 	maxPingTime = 4 * time.Second
 )
 
-type CheckFunction func() (bool, error)
+type CheckFunction func() (bool, error, int64)
 
 func NewPingCheck(ip string) CheckFunction {
-	return func() (bool, error) {
+	return func() (bool, error, int64) {
 		var retRtt time.Duration = 0
 		var isUp bool = false
 
@@ -28,7 +28,7 @@ func NewPingCheck(ip string) CheckFunction {
 		ra, err := net.ResolveIPAddr("ip4:icmp", ip)
 
 		if err != nil {
-			return false, err
+			return false, err, 0
 		}
 
 		p.AddIPAddr(ra)
@@ -39,10 +39,10 @@ func NewPingCheck(ip string) CheckFunction {
 
 		err = p.Run()
 		if err != nil {
-			return false, err
+			return false, err, 0
 		}
 
-		return isUp, nil
+		return isUp, nil, 0
 	}
 }
 
@@ -59,7 +59,7 @@ var DefaultTcpCheckConf = TcpCheckerConf{
 }
 
 func NewTcpPortChecker(ip string, port int, conf TcpCheckerConf) CheckFunction {
-	return func() (bool, error) {
+	return func() (bool, error, int64) {
 		var err error
 		var conn net.Conn
 
@@ -67,26 +67,26 @@ func NewTcpPortChecker(ip string, port int, conf TcpCheckerConf) CheckFunction {
 			conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), conf.timeout)
 			if err == nil {
 				conn.Close()
-				return true, nil
+				return true, nil, 0
 			}
 			time.Sleep(conf.retrytime)
 		}
-		return false, err
+		return false, err, 0
 	}
 }
 
 func NewHttpChecker(url string, expectedStatusCode int) CheckFunction {
-	return func() (bool, error) {
+	return func() (bool, error, int64) {
 		response, err := http.Get(url)
 		if err != nil {
-			return false, err
+			return false, err, 0
 		} else {
 			defer response.Body.Close()
 			if response.StatusCode == expectedStatusCode {
-				return true, nil
+				return true, nil, 0
 			}
 		}
-		return false, err
+		return false, err, 0
 	}
 }
 
@@ -103,12 +103,12 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 }
 
 func NewSnmpChecker(ip, community string, conf SnmpCheckerConf, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
-	return func() (bool, error) {
+	return func() (bool, error, int64) {
 		_, err := snmpQuerier.Get(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
 		if err == nil {
-			return true, nil
+			return true, nil, 0
 		} else {
-			return false, err
+			return false, err, 0
 		}
 	}
 }

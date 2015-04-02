@@ -1,9 +1,17 @@
 package felixcheck
 
 import (
+	"fmt"
+
+	"encoding/json"
+
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
 )
+
+type CheckPublisher interface {
+	PublishCheckResult(result CheckResult)
+}
 
 type RabbitMqPublisher struct {
 	publisher *simpleamqp.AmqpPublisher
@@ -12,6 +20,18 @@ type RabbitMqPublisher struct {
 func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	p := RabbitMqPublisher{simpleamqp.NewAmqpPublisher(amqpuri, exchange)}
 	return p
+}
+
+func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
+	var state string
+	if result.result == true {
+		state = "ok"
+	} else {
+		state = "critical"
+	}
+	topic := fmt.Sprintf("check.%s.%s", result.service, result.host)
+	serialized, _ := json.Marshal(CheckResultMessage{result.host, result.service, state, result.metric})
+	p.publisher.Publish(topic, serialized)
 }
 
 type RiemannPublisher struct {

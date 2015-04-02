@@ -1,10 +1,7 @@
 package felixcheck
 
 import (
-	"fmt"
 	"time"
-
-	"encoding/json"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 )
@@ -44,20 +41,4 @@ func (ce CheckEngine) AddCheck(host, service string, period time.Duration, check
 		result, err, metric := check()
 		ce.results <- CheckResult{host, service, result, err, metric}
 	}, period, 0)
-}
-
-type CheckPublisher interface {
-	PublishCheckResult(result CheckResult)
-}
-
-func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
-	var state string
-	if result.result == true {
-		state = "ok"
-	} else {
-		state = "critical"
-	}
-	topic := fmt.Sprintf("check.%s.%s", result.service, result.host)
-	serialized, _ := json.Marshal(CheckResultMessage{result.host, result.service, state, result.metric})
-	p.publisher.Publish(topic, serialized)
 }

@@ -9,6 +9,9 @@ It includes:
    * ICMP/Ping
    * http
    * snmp get
+ * Publishers:
+  * [riemann](http://riemann.io/)
+  * RabbitMQ / AMQP
 
 Install
 =======
@@ -19,5 +22,4 @@ go get github.com/aleasoluciones/felixcheck
 
 Todo
 ====
- * [riemann](http://riemann.io/) publisher
  * include metrics with each check

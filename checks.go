@@ -42,7 +42,7 @@ func NewPingCheck(ip string) CheckFunction {
 			return false, err, 0
 		}
 
-		return isUp, nil, 0
+		return isUp, nil, float32(retRtt.Nanoseconds() / 1e6)
 	}
 }
 
@@ -77,6 +77,7 @@ func NewTcpPortChecker(ip string, port int, conf TcpCheckerConf) CheckFunction {
 
 func NewHttpChecker(url string, expectedStatusCode int) CheckFunction {
 	return func() (bool, error, float32) {
+		var t1 = time.Now()
 		response, err := http.Get(url)
 		if err != nil {
 			return false, err, 0
@@ -86,7 +87,7 @@ func NewHttpChecker(url string, expectedStatusCode int) CheckFunction {
 				return true, nil, 0
 			}
 		}
-		return false, err, 0
+		return false, err, float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
 	}
 }
 

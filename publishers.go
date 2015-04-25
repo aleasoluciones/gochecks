@@ -2,6 +2,7 @@ package felixcheck
 
 import (
 	"fmt"
+	"log"
 
 	"encoding/json"
 
@@ -46,7 +47,8 @@ func NewRiemannPublisher(addr string) RiemannPublisher {
 func (p RiemannPublisher) PublishCheckResult(result CheckResult) {
 	err := p.client.Connect()
 	if err != nil {
-		panic(err)
+		log.Printf("[error] publishing check %s %s", result, err)
+		return
 	}
 	defer p.client.Close()
 
@@ -63,6 +65,7 @@ func (p RiemannPublisher) PublishCheckResult(result CheckResult) {
 		Metric:  result.metric,
 	})
 	if err != nil {
-		panic(err)
+		log.Printf("[error] sending check %s %s", result, err)
+		return
 	}
 }

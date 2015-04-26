@@ -79,15 +79,16 @@ func NewHttpChecker(url string, expectedStatusCode int) CheckFunction {
 	return func() (bool, error, float32) {
 		var t1 = time.Now()
 		response, err := http.Get(url)
+		milliseconds := float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
 		if err != nil {
-			return false, err, 0
+			return false, err, milliseconds
 		} else {
 			defer response.Body.Close()
 			if response.StatusCode == expectedStatusCode {
-				return true, nil, 0
+				return true, nil, milliseconds
 			}
 		}
-		return false, err, float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
+		return false, err, milliseconds
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/aleasoluciones/gosnmpquerier"
+	"github.com/aleasoluciones/simpleamqp"
 	"github.com/tatsushid/go-fastping"
 )
 
@@ -111,6 +112,17 @@ func NewSnmpChecker(ip, community string, conf SnmpCheckerConf, snmpQuerier gosn
 			return true, nil, 0
 		} else {
 			return false, err, 0
+		}
+	}
+}
+
+func NewRabbitMQQueueLenCheck(amqpuri, queue string, max int) CheckFunction {
+	return func() (bool, error, float32) {
+		queueInfo, err := simpleamqp.NewAmqpManagement(amqpuri).QueueInfo(queue)
+		if err == nil {
+			return queueInfo.Messages < max, nil, float32(queueInfo.Messages)
+		} else {
+			return false, nil, float32(0)
 		}
 	}
 }

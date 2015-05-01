@@ -116,6 +116,24 @@ func NewSnmpChecker(ip, community string, conf SnmpCheckerConf, snmpQuerier gosn
 	}
 }
 
+func NewC4CMTSTempChecker(ip, community string, maxAllowedTemp int, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
+	return func() (bool, error, float32) {
+		result, err := snmpQuerier.Walk(ip, community, "1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29", 2*time.Second, 1)
+
+		if err == nil {
+			max := 0
+			for _, r := range result {
+				if r.Value.(int) != 999 && r.Value.(int) > max {
+					max = r.Value.(int)
+				}
+			}
+			return max < maxAllowedTemp, nil, float32(max)
+		} else {
+			return false, err, 0
+		}
+	}
+}
+
 func NewRabbitMQQueueLenCheck(amqpuri, queue string, max int) CheckFunction {
 	return func() (bool, error, float32) {
 		queueInfo, err := simpleamqp.NewAmqpManagement(amqpuri).QueueInfo(queue)

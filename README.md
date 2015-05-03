@@ -10,6 +10,8 @@ It includes:
    * http
    * snmp get
    * rabbitmq queue len
+   * Arris C4 CMTS temp
+
  * Publishers:
   * [riemann](http://riemann.io/)
   * RabbitMQ / AMQP

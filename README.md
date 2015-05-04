@@ -26,3 +26,5 @@ go get github.com/aleasoluciones/felixcheck
 Todo
 ====
  * include tags with each check result
+ * Temperature/CPUUsage Juniper Switches/Routers
+

@@ -19,7 +19,7 @@ const (
 
 type CheckFunction func() (bool, error, float32)
 
-func NewPingCheck(ip string) CheckFunction {
+func NewPingChecker(ip string) CheckFunction {
 	return func() (bool, error, float32) {
 		var retRtt time.Duration = 0
 		var isUp bool = false

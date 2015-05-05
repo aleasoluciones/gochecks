@@ -8,10 +8,22 @@ import (
 
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
+	"github.com/kr/pretty"
 )
 
 type CheckPublisher interface {
 	PublishCheckResult(result CheckResult)
+}
+
+type LogPublisher struct {
+}
+
+func NewLogPublisher() LogPublisher {
+	return LogPublisher{}
+}
+
+func (p LogPublisher) PublishCheckResult(result CheckResult) {
+	pretty.Println(result)
 }
 
 type RabbitMqPublisher struct {

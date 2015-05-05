@@ -134,17 +134,25 @@ func NewC4CMTSTempChecker(ip, community string, maxAllowedTemp int, snmpQuerier 
 	}
 }
 
+func getMaxValueFromSnmpWalk(oid, ip, community string, snmpQuerier gosnmpquerier.SyncQuerier) (uint, error) {
+	result, err := snmpQuerier.Walk(ip, community, oid, 2*time.Second, 1)
+	if err == nil {
+		max := uint(0)
+		for _, r := range result {
+			if r.Value.(uint) > max {
+				max = r.Value.(uint)
+			}
+		}
+		return max, nil
+	} else {
+		return 0, err
+	}
+}
+
 func NewJuniperTempChecker(ip, community string, maxAllowedTemp uint, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
 	return func() (bool, error, float32) {
-		result, err := snmpQuerier.Walk(ip, community, "1.3.6.1.4.1.2636.3.1.13.1.7", 2*time.Second, 1)
-
+		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.7", ip, community, snmpQuerier)
 		if err == nil {
-			max := uint(0)
-			for _, r := range result {
-				if r.Value.(uint) > max {
-					max = r.Value.(uint)
-				}
-			}
 			return max < maxAllowedTemp, nil, float32(max)
 		} else {
 			return false, err, 0
@@ -154,15 +162,8 @@ func NewJuniperTempChecker(ip, community string, maxAllowedTemp uint, snmpQuerie
 
 func NewJuniperCpuChecker(ip, community string, maxAllowedTemp uint, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
 	return func() (bool, error, float32) {
-		result, err := snmpQuerier.Walk(ip, community, "1.3.6.1.4.1.2636.3.1.13.1.8", 2*time.Second, 1)
-
+		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community, snmpQuerier)
 		if err == nil {
-			max := uint(0)
-			for _, r := range result {
-				if r.Value.(uint) > max {
-					max = r.Value.(uint)
-				}
-			}
 			return max < maxAllowedTemp, nil, float32(max)
 		} else {
 			return false, err, 0

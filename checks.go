@@ -3,13 +3,20 @@ package felixcheck
 import (
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
 	"net/http"
+	"net/url"
 
 	"github.com/aleasoluciones/gosnmpquerier"
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/tatsushid/go-fastping"
+)
+
+import (
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
@@ -179,5 +186,33 @@ func NewRabbitMQQueueLenCheck(amqpuri, queue string, max int) CheckFunction {
 		} else {
 			return false, nil, float32(0)
 		}
+	}
+}
+
+func NewMysqlConnectionCheck(mysqluri string) CheckFunction {
+	return func() (bool, error, float32) {
+		u, err := url.Parse(mysqluri)
+		if err != nil {
+			return false, err, float32(0)
+		}
+
+		password, _ := u.User.Password()
+		hostAndPort := u.Host
+		if !strings.Contains(hostAndPort, ":") {
+			hostAndPort = hostAndPort + ":3306"
+		}
+		con, err := sql.Open("mysql", u.User.Username()+":"+password+"@"+"tcp("+hostAndPort+")"+u.Path)
+		defer con.Close()
+		if err != nil {
+			return false, err, float32(0)
+		}
+		q := `select CURTIME()`
+		row := con.QueryRow(q)
+		var date string
+		err = row.Scan(&date)
+		if err != nil {
+			return false, err, float32(0)
+		}
+		return true, nil, float32(0)
 	}
 }

@@ -11,6 +11,8 @@ It includes:
    * snmp get
    * rabbitmq queue len
    * Arris C4 CMTS temp
+   * JunOS devices cpu usage and temp
+   * MySQL connectivity
 
  * Publishers:
   * [riemann](http://riemann.io/)
@@ -25,6 +27,5 @@ go get github.com/aleasoluciones/felixcheck
 
 Todo
 ====
- * include tags with each check result
- * Temperature/CPUUsage Juniper Switches/Routers
-
+ * include tags forma each checo result
+ * arbitrary check results (ok, warning, critical...)

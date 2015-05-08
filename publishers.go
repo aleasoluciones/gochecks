@@ -8,11 +8,10 @@ import (
 
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
-	"github.com/kr/pretty"
 )
 
 type CheckPublisher interface {
-	PublishCheckResult(result CheckResult)
+	PublishCheckResult(goryman.Event)
 }
 
 type LogPublisher struct {
@@ -22,8 +21,8 @@ func NewLogPublisher() LogPublisher {
 	return LogPublisher{}
 }
 
-func (p LogPublisher) PublishCheckResult(result CheckResult) {
-	pretty.Println(result)
+func (p LogPublisher) PublishCheckResult(event goryman.Event) {
+	log.Println(event)
 }
 
 type RabbitMqPublisher struct {
@@ -35,15 +34,9 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	return p
 }
 
-func (p RabbitMqPublisher) PublishCheckResult(result CheckResult) {
-	var state string
-	if result.result == true {
-		state = "ok"
-	} else {
-		state = "critical"
-	}
-	topic := fmt.Sprintf("check.%s.%s", result.service, result.host)
-	serialized, _ := json.Marshal(CheckResultMessage{result.host, result.service, state, result.metric})
+func (p RabbitMqPublisher) PublishCheckResult(event goryman.Event) {
+	topic := fmt.Sprintf("check.%s.%s", event.Host, event.Service)
+	serialized, _ := json.Marshal(event)
 	p.publisher.Publish(topic, serialized)
 }
 
@@ -56,28 +49,17 @@ func NewRiemannPublisher(addr string) RiemannPublisher {
 	return p
 }
 
-func (p RiemannPublisher) PublishCheckResult(result CheckResult) {
+func (p RiemannPublisher) PublishCheckResult(event goryman.Event) {
 	err := p.client.Connect()
 	if err != nil {
-		log.Printf("[error] publishing check %s %s", result, err)
+		log.Printf("[error] publishing check %s", event)
 		return
 	}
 	defer p.client.Close()
 
-	var state string
-	if result.result == true {
-		state = "ok"
-	} else {
-		state = "critical"
-	}
-	err = p.client.SendEvent(&goryman.Event{
-		Host:    result.host,
-		Service: result.host,
-		State:   state,
-		Metric:  result.metric,
-	})
+	err = p.client.SendEvent(&event)
 	if err != nil {
-		log.Printf("[error] sending check %s %s", result, err)
+		log.Printf("[error] sending check %s", event)
 		return
 	}
 }

@@ -1,7 +1,9 @@
 felixcheck
 ==========
 
-felixcheck package provides utilities to check network services health. It is written fully in Go. 
+felixcheck package provides utilities to check services health and publish events (riemann events). 
+It is written fully in Go. 
+
 It includes:
  * checks scheduler
  * various checks:
@@ -27,5 +29,4 @@ go get github.com/aleasoluciones/felixcheck
 
 Todo
 ====
- * include tags forma each checo result
- * arbitrary check results (ok, warning, critical...)
+ * Metric for all the checks

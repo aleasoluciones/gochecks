@@ -4,30 +4,16 @@ import (
 	"time"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
+	"github.com/bigdatadev/goryman"
 )
-
-type CheckResultMessage struct {
-	Host    string  `json:"host"`
-	Service string  `json:"service"`
-	State   string  `json:"state"`
-	Metric  float32 `json:"metric"`
-}
-
-type CheckResult struct {
-	host    string
-	service string
-	result  bool
-	err     error
-	metric  float32
-}
 
 type CheckEngine struct {
 	checkPublisher CheckPublisher
-	results        chan CheckResult
+	results        chan goryman.Event
 }
 
 func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
-	checkEngine := CheckEngine{checkPublisher, make(chan CheckResult)}
+	checkEngine := CheckEngine{checkPublisher, make(chan goryman.Event)}
 	go func() {
 		for result := range checkEngine.results {
 			checkEngine.checkPublisher.PublishCheckResult(result)
@@ -36,9 +22,8 @@ func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
 	return checkEngine
 }
 
-func (ce CheckEngine) AddCheck(host, service string, period time.Duration, check CheckFunction) {
+func (ce CheckEngine) AddCheck(check CheckFunction, period time.Duration) {
 	scheduledtask.NewScheduledTask(func() {
-		result, err, metric := check()
-		ce.results <- CheckResult{host, service, result, err, metric}
+		ce.results <- check()
 	}, period, 0)
 }

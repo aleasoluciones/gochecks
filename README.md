@@ -1,7 +1,7 @@
 felixcheck
 ==========
 
-felixcheck package provides utilities to check services health and publish events (riemann events). 
+felixcheck package provides utilities to check services health and publish events. 
 It is written fully in Go. 
 
 It includes:
@@ -30,3 +30,5 @@ go get github.com/aleasoluciones/felixcheck
 Todo
 ====
  * Metric for all the checks
+ * Tags for the results
+ * Nagios output format

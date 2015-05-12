@@ -27,10 +27,18 @@ const (
 
 type CheckFunction func() goryman.Event
 
-func AddTags(f CheckFunction, tags ...string) CheckFunction {
+func (f CheckFunction) Tags(tags ...string) CheckFunction {
 	return func() goryman.Event {
 		result := f()
 		result.Tags = tags
+		return result
+	}
+}
+
+func (f CheckFunction) Ttl(ttl float32) CheckFunction {
+	return func() goryman.Event {
+		result := f()
+		result.Ttl = ttl
 		return result
 	}
 }

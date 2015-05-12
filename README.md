@@ -30,5 +30,4 @@ go get github.com/aleasoluciones/felixcheck
 Todo
 ====
  * Metric for all the checks
- * Tags for the results
  * Nagios output format

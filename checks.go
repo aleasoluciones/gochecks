@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"container/ring"
 	"net/http"
 	"net/url"
 
@@ -252,4 +253,37 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 		}
 		return goryman.Event{Host: host, Service: service, State: "ok"}
 	}
+}
+
+type ObtainMetricFunction func() float32
+type CalculateStateFunction func(float32, float32) string
+
+func NewGenericCheck(host, service string, metricFunc ObtainMetricFunction, stateFunc CalculateStateFunction, windowSize int) CheckFunction {
+	window := ring.New(windowSize)
+
+	return func() goryman.Event {
+		value := metricFunc()
+		var state string = stateFunc(windowMean(window), value)
+		window.Value = value
+		window = window.Next()
+		return goryman.Event{Host: host, Service: service, State: state, Metric: value}
+	}
+}
+
+func windowMean(window *ring.Ring) float32 {
+	numPoints := 0
+	sum := float32(0)
+
+	window.Do(func(x interface{}) {
+		switch x.(type) {
+		case float32:
+			sum = sum + x.(float32)
+			numPoints = numPoints + 1
+		}
+	})
+
+	if numPoints == 0 {
+		return 0
+	}
+	return sum / float32(numPoints)
 }

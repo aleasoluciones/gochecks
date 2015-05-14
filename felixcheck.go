@@ -27,3 +27,11 @@ func (ce CheckEngine) AddCheck(check CheckFunction, period time.Duration) {
 		ce.results <- check()
 	}, period, 0)
 }
+
+func (ce CheckEngine) AddMultiCheck(check MultiCheckFunction, period time.Duration) {
+	scheduledtask.NewScheduledTask(func() {
+		for _, result := range check() {
+			ce.results <- result
+		}
+	}, period, 0)
+}

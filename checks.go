@@ -26,6 +26,7 @@ const (
 )
 
 type CheckFunction func() goryman.Event
+type MultiCheckFunction func() []goryman.Event
 
 func (f CheckFunction) Tags(tags ...string) CheckFunction {
 	return func() goryman.Event {

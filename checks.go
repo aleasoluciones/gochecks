@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aleasoluciones/gosnmpquerier"
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
 	"github.com/tatsushid/go-fastping"
@@ -134,9 +133,10 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 	oidToCheck: sysName,
 }
 
-func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
+func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf) CheckFunction {
 	return func() goryman.Event {
-		_, err := snmpQuerier.Get(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
+
+		_, err := snmpGet(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
 		if err == nil {
 			return goryman.Event{Host: host, Service: service, State: "ok", Description: err.Error()}
 		} else {
@@ -145,9 +145,10 @@ func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf, s
 	}
 }
 
-func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp int, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
+func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp int) CheckFunction {
 	return func() goryman.Event {
-		result, err := snmpQuerier.Walk(ip, community, "1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29", 2*time.Second, 1)
+
+		result, err := snmpWalk(ip, community, "1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29", 2*time.Second, 1)
 
 		if err == nil {
 			max := 0
@@ -167,8 +168,8 @@ func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp in
 	}
 }
 
-func getMaxValueFromSnmpWalk(oid, ip, community string, snmpQuerier gosnmpquerier.SyncQuerier) (uint, error) {
-	result, err := snmpQuerier.Walk(ip, community, oid, 2*time.Second, 1)
+func getMaxValueFromSnmpWalk(oid, ip, community string) (uint, error) {
+	result, err := snmpWalk(ip, community, oid, 2*time.Second, 1)
 	if err == nil {
 		max := uint(0)
 		for _, r := range result {
@@ -182,9 +183,9 @@ func getMaxValueFromSnmpWalk(oid, ip, community string, snmpQuerier gosnmpquerie
 	}
 }
 
-func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp uint, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
+func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
 	return func() goryman.Event {
-		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.7", ip, community, snmpQuerier)
+		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.7", ip, community)
 		if err == nil {
 			var state string = "critical"
 			if max < maxAllowedTemp {
@@ -197,9 +198,9 @@ func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp u
 	}
 }
 
-func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp uint, snmpQuerier gosnmpquerier.SyncQuerier) CheckFunction {
+func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
 	return func() goryman.Event {
-		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community, snmpQuerier)
+		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community)
 		if err == nil {
 			var state string = "critical"
 			if max < maxAllowedTemp {

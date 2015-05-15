@@ -10,5 +10,6 @@ before_install:
 
 script:
   - go build
-  - go build examples/example.go
+  - cd example; go build example.go
+
   

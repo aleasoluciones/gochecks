@@ -20,5 +20,4 @@ env:
 script:
   - go build
   - go test -tags integration ./...
-  - cd example; go build example.go
   - $HOME/gopath/bin/goveralls -repotoken 3AS6K6bjImhYrxzQNg2lczOVjkjKneEGv

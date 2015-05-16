@@ -11,5 +11,7 @@ before_install:
 script:
   - go build
   - cd example; go build example.go
+  - docker run -p 5672:5672 -d rabbitmq
+
 
   

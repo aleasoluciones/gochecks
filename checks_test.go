@@ -52,13 +52,7 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 
 	ch.ExchangeDeclare(exchange, "topic", true, false, false, false, nil)
 	ch.QueueDelete(queue, false, false, true)
-	ch.QueueDeclare(queue,
-		false, // Durable
-		false, // Delete
-		false, // Exclusive
-		false, // noWait
-		nil,   // arguments
-	)
+	ch.QueueDeclare(queue, false, false, false, false, nil)
 	ch.QueueBind(queue, "#", exchange, false, nil)
 
 	check := NewRabbitMQQueueLenCheck("host", "service", amqpUrl, queue, 2)

@@ -7,9 +7,6 @@ go:
 
 before_install:
   - go get -v ./...
-  - go get github.com/mattn/goveralls
-  - go get golang.org/x/tools/cmd/cover
-
 
 services:
   - rabbitmq
@@ -20,4 +17,4 @@ env:
 script:
   - go build
   - go test -tags integration ./...
-  - $HOME/gopath/bin/goveralls -repotoken 3AS6K6bjImhYrxzQNg2lczOVjkjKneEGv
+  - cd example; go build example.go

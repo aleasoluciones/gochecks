@@ -16,5 +16,5 @@ env:
 
 script:
   - go build
-  - cd example; go build example.go
   - go test -tags integration ./...
+  - cd example; go build example.go

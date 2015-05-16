@@ -218,7 +218,7 @@ func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) Che
 		queueInfo, err := simpleamqp.NewAmqpManagement(amqpuri).QueueInfo(queue)
 		if err == nil {
 			var state string = "critical"
-			if queueInfo.Messages < max {
+			if queueInfo.Messages <= max {
 				state = "ok"
 			}
 			return goryman.Event{Host: host, Service: service, State: state, Metric: float32(queueInfo.Messages)}

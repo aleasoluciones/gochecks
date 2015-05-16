@@ -8,10 +8,13 @@ go:
 before_install:
   - go get -v ./...
 
+services:
+  - rabbitmq
+
+env:
+ - AMQP_URL=amqp://guest:guest@127.0.0.1:5672/
+
 script:
   - go build
   - cd example; go build example.go
-  - docker run -p 5672:5672 -d rabbitmq
-
-
-  
+  - go test -tags integration ./...

@@ -1,6 +1,7 @@
 #felixcheck
 [![Build Status](https://travis-ci.org/aleasoluciones/felixcheck.svg?branch=master)](https://travis-ci.org/aleasoluciones/felixcheck)
 [![GoDoc](https://godoc.org/github.com/aleasoluciones/felixcheck?status.png)](http://godoc.org/github.com/aleasoluciones/felixcheck)
+[![Coverage Status](https://coveralls.io/repos/aleasoluciones/felixcheck/badge.svg)](https://coveralls.io/r/aleasoluciones/felixcheck)
 
 felixcheck package provides utilities to check services health and publish events. 
 It is written fully in Go. 

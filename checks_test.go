@@ -73,3 +73,12 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 	assert.Equal(t, checkResult.Metric, float32(3))
 
 }
+
+// func TestRabbitMQQueueLenCheckReturnsCriticalWhenCantConnectToRabbitMQ(t *testing.T) {
+// 	t.Parallel()
+
+// 	check := NewRabbitMQQueueLenCheck("host", "service", amqpUrlFromEnv()+"whatever", "queue", 2)
+// 	checkResult := check()
+
+// 	assert.Equal(t, checkResult.State, "critical")
+// }

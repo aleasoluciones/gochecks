@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
+	"github.com/streadway/amqp"
 	"github.com/tatsushid/go-fastping"
 )
 
@@ -215,16 +215,36 @@ func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp ui
 
 func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) CheckFunction {
 	return func() goryman.Event {
-		queueInfo, err := simpleamqp.NewAmqpManagement(amqpuri).QueueInfo(queue)
-		if err == nil {
-			var state string = "critical"
-			if queueInfo.Messages <= max {
-				state = "ok"
-			}
-			return goryman.Event{Host: host, Service: service, State: state, Metric: float32(queueInfo.Messages)}
-		} else {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+		result := goryman.Event{Host: host, Service: service}
+
+		conn, err := amqp.Dial(amqpuri)
+		if err != nil {
+			result.State = "critical"
+			result.Description = err.Error()
+			return result
 		}
+
+		ch, err := conn.Channel()
+		if err != nil {
+			result.State = "critical"
+			result.Description = err.Error()
+			return result
+		}
+		defer ch.Close()
+		defer conn.Close()
+
+		queueInfo, err := ch.QueueInspect(queue)
+		if err != nil {
+			result.State = "critical"
+			result.Description = err.Error()
+			return result
+		}
+
+		var state string = "critical"
+		if queueInfo.Messages <= max {
+			state = "ok"
+		}
+		return goryman.Event{Host: host, Service: service, State: state, Metric: float32(queueInfo.Messages)}
 	}
 }
 

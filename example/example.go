@@ -10,7 +10,7 @@ func main() {
 	checkEngine := felixcheck.NewCheckEngine(felixcheck.NewRiemannPublisher("127.0.0.1:5555"))
 	period := 5 * time.Second
 	checkEngine.AddCheck(
-		felixcheck.NewHttpChecker("golang", "http", "http://www.golang.org", 200).Tags("production", "web").Ttl(50),
+		felixcheck.NewHttpChecker("golang", "http", "http://www.golang.org", 200).Attributes(map[string]string{"version":"1", "network":"google"}).Tags("production", "web").Ttl(50),
 		period)
 
 	checkEngine.AddCheck(

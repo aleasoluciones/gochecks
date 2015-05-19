@@ -35,6 +35,14 @@ func (f CheckFunction) Tags(tags ...string) CheckFunction {
 	}
 }
 
+func (f CheckFunction) Attributes(attributes map[string]string) CheckFunction {
+	return func() goryman.Event {
+		result := f()
+		result.Attributes = attributes
+		return result
+	}
+}
+
 func (f CheckFunction) Ttl(ttl float32) CheckFunction {
 	return func() goryman.Event {
 		result := f()

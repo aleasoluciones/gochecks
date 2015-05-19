@@ -1,6 +1,6 @@
-package felixcheck_test
-
 // +build integration
+
+package felixcheck_test
 
 import (
 	"os"

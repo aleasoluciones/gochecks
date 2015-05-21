@@ -106,7 +106,9 @@ func NewTcpPortChecker(host, service, ip string, port int, conf TcpCheckerConf) 
 	}
 }
 
-func NewHttpChecker(host, service, url string, expectedStatusCode int) CheckFunction {
+type ValidateHttpResponseFunction func(resp *http.Response) (state, description string)
+
+func NewGenericHttpChecker(host, service, url string, validationFunc ValidateHttpResponseFunction) CheckFunction {
 	return func() goryman.Event {
 		var t1 = time.Now()
 
@@ -119,14 +121,21 @@ func NewHttpChecker(host, service, url string, expectedStatusCode int) CheckFunc
 			if response.Body != nil {
 				defer response.Body.Close()
 			}
-			if response.StatusCode == expectedStatusCode {
-				result.State = "ok"
-			} else {
-				result.Description = fmt.Sprintf("Response %d", response.StatusCode)
-			}
+			result.State, result.Description = validationFunc(response)
 		}
 		return result
 	}
+}
+
+func NewHttpChecker(host, service, url string, expectedStatusCode int) CheckFunction {
+	return NewGenericHttpChecker(host, service, url,
+		func(httpResp *http.Response) (string, string) {
+			if httpResp.StatusCode == expectedStatusCode {
+				return "ok", ""
+			} else {
+				return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
+			}
+		})
 }
 
 type SnmpCheckerConf struct {

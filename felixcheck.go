@@ -12,6 +12,9 @@ type Event struct {
 	State       string
 	Metric      interface{}
 	Description string
+	Tags        []string
+	Attributes  map[string]string
+	Ttl         float32
 }
 
 type CheckEngine struct {

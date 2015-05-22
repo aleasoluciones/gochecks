@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -108,18 +109,25 @@ func NewTcpPortChecker(host, service, ip string, port int, conf TcpCheckerConf) 
 
 type ValidateHttpResponseFunction func(resp *http.Response) (state, description string)
 
-func BodyGreaterThan(httpResp *http.Response, minLength int) (state, description string) {
-	if httpResp.StatusCode != 200 {
-		return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
+func BodyGreaterThan(minLength int) ValidateHttpResponseFunction {
+	return func(httpResp *http.Response) (state, description string) {
+		if httpResp.StatusCode != 200 {
+			return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
+		}
+		if httpResp.Body == nil {
+			return "critical", fmt.Sprintf("Empty body")
+		}
+		body, err := ioutil.ReadAll(httpResp.Body)
+		if err != nil {
+			return "critical", fmt.Sprintf("Error geting body")
+		}
+		if len(body) < minLength {
+			return "critical", fmt.Sprintf("Obtained %d bytes, expected more than %d", len(body), minLength)
+		} else {
+			return "ok", ""
+		}
+		return "critical", "unknown condition"
 	}
-	if httpResp.Body == nil {
-		return "critical", fmt.Sprintf("Empty body")
-	}
-
-	if httpResp.ContentLength < int64(minLength) {
-		return "critical", fmt.Sprintf("Less content than expected")
-	}
-	return "critical", "unknown condition"
 }
 
 func NewGenericHttpChecker(host, service, url string, validationFunc ValidateHttpResponseFunction) CheckFunction {

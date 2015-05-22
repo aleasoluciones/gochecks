@@ -11,7 +11,7 @@ import (
 )
 
 type CheckPublisher interface {
-	PublishCheckResult(goryman.Event)
+	PublishCheckResult(Event)
 }
 
 type LogPublisher struct {
@@ -21,7 +21,7 @@ func NewLogPublisher() LogPublisher {
 	return LogPublisher{}
 }
 
-func (p LogPublisher) PublishCheckResult(event goryman.Event) {
+func (p LogPublisher) PublishCheckResult(event Event) {
 	log.Println(event)
 }
 
@@ -34,7 +34,7 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	return p
 }
 
-func (p RabbitMqPublisher) PublishCheckResult(event goryman.Event) {
+func (p RabbitMqPublisher) PublishCheckResult(event Event) {
 	topic := fmt.Sprintf("check.%s.%s", event.Host, event.Service)
 	serialized, _ := json.Marshal(event)
 	p.publisher.Publish(topic, serialized)
@@ -49,15 +49,16 @@ func NewRiemannPublisher(addr string) RiemannPublisher {
 	return p
 }
 
-func (p RiemannPublisher) PublishCheckResult(event goryman.Event) {
+func (p RiemannPublisher) PublishCheckResult(event Event) {
 	err := p.client.Connect()
 	if err != nil {
 		log.Printf("[error] publishing check %s", event)
 		return
 	}
 	defer p.client.Close()
+	riemannEvent := goryman.Event{Description: event.Description, Host: event.Host, Service: event.Service, State: event.State, Metric: event.Metric}
 
-	err = p.client.SendEvent(&event)
+	err = p.client.SendEvent(&riemannEvent)
 	if err != nil {
 		log.Printf("[error] sending check %s", event)
 		return

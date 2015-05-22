@@ -4,16 +4,23 @@ import (
 	"time"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
-	"github.com/bigdatadev/goryman"
 )
+
+type Event struct {
+	Host        string
+	Service     string
+	State       string
+	Metric      interface{}
+	Description string
+}
 
 type CheckEngine struct {
 	checkPublisher CheckPublisher
-	results        chan goryman.Event
+	results        chan Event
 }
 
 func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
-	checkEngine := CheckEngine{checkPublisher, make(chan goryman.Event)}
+	checkEngine := CheckEngine{checkPublisher, make(chan Event)}
 	go func() {
 		for result := range checkEngine.results {
 			checkEngine.checkPublisher.PublishCheckResult(result)

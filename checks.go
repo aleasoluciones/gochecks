@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/bigdatadev/goryman"
 	"github.com/streadway/amqp"
 	"github.com/tatsushid/go-fastping"
 )
@@ -25,11 +24,11 @@ const (
 	maxPingTime = 4 * time.Second
 )
 
-type CheckFunction func() goryman.Event
-type MultiCheckFunction func() []goryman.Event
+type CheckFunction func() Event
+type MultiCheckFunction func() []Event
 
 func (f CheckFunction) Tags(tags ...string) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		result := f()
 		result.Tags = tags
 		return result
@@ -37,7 +36,7 @@ func (f CheckFunction) Tags(tags ...string) CheckFunction {
 }
 
 func (f CheckFunction) Attributes(attributes map[string]string) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		result := f()
 		result.Attributes = attributes
 		return result
@@ -45,7 +44,7 @@ func (f CheckFunction) Attributes(attributes map[string]string) CheckFunction {
 }
 
 func (f CheckFunction) Ttl(ttl float32) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		result := f()
 		result.Ttl = ttl
 		return result
@@ -53,9 +52,9 @@ func (f CheckFunction) Ttl(ttl float32) CheckFunction {
 }
 
 func NewPingChecker(host, service, ip string) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		var retRtt time.Duration = 0
-		var result goryman.Event = goryman.Event{Host: host, Service: service, State: "critical"}
+		var result Event = Event{Host: host, Service: service, State: "critical"}
 
 		p := fastping.NewPinger()
 		p.MaxRTT = maxPingTime
@@ -91,7 +90,7 @@ var DefaultTcpCheckConf = TcpCheckerConf{
 }
 
 func NewTcpPortChecker(host, service, ip string, port int, conf TcpCheckerConf) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		var err error
 		var conn net.Conn
 
@@ -99,11 +98,11 @@ func NewTcpPortChecker(host, service, ip string, port int, conf TcpCheckerConf) 
 			conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), conf.timeout)
 			if err == nil {
 				conn.Close()
-				return goryman.Event{Host: host, Service: service, State: "ok"}
+				return Event{Host: host, Service: service, State: "ok"}
 			}
 			time.Sleep(conf.retrytime)
 		}
-		return goryman.Event{Host: host, Service: service, State: "critical"}
+		return Event{Host: host, Service: service, State: "critical"}
 	}
 }
 
@@ -131,12 +130,12 @@ func BodyGreaterThan(minLength int) ValidateHttpResponseFunction {
 }
 
 func NewGenericHttpChecker(host, service, url string, validationFunc ValidateHttpResponseFunction) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		var t1 = time.Now()
 
 		response, err := http.Get(url)
 		milliseconds := float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
-		result := goryman.Event{Host: host, Service: service, State: "critical", Metric: milliseconds}
+		result := Event{Host: host, Service: service, State: "critical", Metric: milliseconds}
 		if err != nil {
 			result.Description = err.Error()
 		} else {
@@ -173,19 +172,19 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 }
 
 func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 
 		_, err := snmpGet(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
 		if err == nil {
-			return goryman.Event{Host: host, Service: service, State: "ok", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "ok", Description: err.Error()}
 		} else {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 	}
 }
 
 func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp int) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 
 		result, err := snmpWalk(ip, community, "1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29", 2*time.Second, 1)
 
@@ -200,9 +199,9 @@ func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp in
 			if max < maxAllowedTemp {
 				state = "ok"
 			}
-			return goryman.Event{Host: host, Service: service, State: state, Metric: float32(max)}
+			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
 		} else {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 	}
 }
@@ -223,38 +222,38 @@ func getMaxValueFromSnmpWalk(oid, ip, community string) (uint, error) {
 }
 
 func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.7", ip, community)
 		if err == nil {
 			var state string = "critical"
 			if max < maxAllowedTemp {
 				state = "ok"
 			}
-			return goryman.Event{Host: host, Service: service, State: state, Metric: float32(max)}
+			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
 		} else {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 	}
 }
 
 func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community)
 		if err == nil {
 			var state string = "critical"
 			if max < maxAllowedTemp {
 				state = "ok"
 			}
-			return goryman.Event{Host: host, Service: service, State: state, Metric: float32(max)}
+			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
 		} else {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 	}
 }
 
 func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) CheckFunction {
-	return func() goryman.Event {
-		result := goryman.Event{Host: host, Service: service}
+	return func() Event {
+		result := Event{Host: host, Service: service}
 
 		conn, err := amqp.Dial(amqpuri)
 		if err != nil {
@@ -283,15 +282,15 @@ func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) Che
 		if queueInfo.Messages <= max {
 			state = "ok"
 		}
-		return goryman.Event{Host: host, Service: service, State: state, Metric: float32(queueInfo.Messages)}
+		return Event{Host: host, Service: service, State: state, Metric: float32(queueInfo.Messages)}
 	}
 }
 
 func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		u, err := url.Parse(mysqluri)
 		if err != nil {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 
 		password, _ := u.User.Password()
@@ -302,16 +301,16 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 		con, err := sql.Open("mysql", u.User.Username()+":"+password+"@"+"tcp("+hostAndPort+")"+u.Path)
 		defer con.Close()
 		if err != nil {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 		q := `select CURTIME()`
 		row := con.QueryRow(q)
 		var date string
 		err = row.Scan(&date)
 		if err != nil {
-			return goryman.Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
-		return goryman.Event{Host: host, Service: service, State: "ok"}
+		return Event{Host: host, Service: service, State: "ok"}
 	}
 }
 
@@ -319,9 +318,9 @@ type ObtainMetricFunction func() float32
 type CalculateStateFunction func(float32) string
 
 func NewGenericCheck(host, service string, metricFunc ObtainMetricFunction, stateFunc CalculateStateFunction) CheckFunction {
-	return func() goryman.Event {
+	return func() Event {
 		value := metricFunc()
 		var state string = stateFunc(value)
-		return goryman.Event{Host: host, Service: service, State: state, Metric: value}
+		return Event{Host: host, Service: service, State: state, Metric: value}
 	}
 }

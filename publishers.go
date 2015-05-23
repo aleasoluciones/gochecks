@@ -56,7 +56,7 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 		return
 	}
 	defer p.client.Close()
-	riemannEvent := goryman.Event{Description: event.Description, Host: event.Host, Service: event.Service, State: event.State, Metric: event.Metric}
+	riemannEvent := goryman.Event{Description: event.Description, Host: event.Host, Service: event.Service, State: event.State, Metric: event.Metric, Tags: event.Tags, Attributes: event.Attributes, Ttl: event.Ttl}
 
 	err = p.client.SendEvent(&riemannEvent)
 	if err != nil {

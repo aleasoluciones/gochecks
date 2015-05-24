@@ -3,6 +3,8 @@ package felixcheck
 import (
 	"fmt"
 	"log"
+	"net/url"
+	"time"
 
 	"encoding/json"
 
@@ -67,16 +69,17 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 }
 
 type InfluxdbPublisher struct {
-	client *client.Config
+	client       *client.Client
+	databaseName string
 }
 
-func NewInfluxdbPublisher(host, port, username, password string) InfluxdbPublisher {
+func NewInfluxdbPublisher(host, port, databaseName, username, password string) InfluxdbPublisher {
 	u, err := url.Parse(fmt.Sprintf("http://%s:%d", host, port))
 	if err != nil {
 		log.Fatal(err)
 	}
 	conf := client.Config{
-		URL:      u,
+		URL:      *u,
 		Username: username,
 		Password: password,
 	}
@@ -84,25 +87,31 @@ func NewInfluxdbPublisher(host, port, username, password string) InfluxdbPublish
 	if err != nil {
 		log.Fatal(err)
 	}
-	p := InfluxdbPublisher{&con}
+	p := InfluxdbPublisher{client: con, databaseName: databaseName}
 	return p
 }
 
 func (p InfluxdbPublisher) PublishCheckResult(event Event) {
+	influxdbTags := make(map[string]string)
+	for _, value := range event.Tags {
+		influxdbTags[value] = "0"
+	}
 	point := client.Point{
-		Name:      "bifer",
-		Tags:      event.Tags,
-		Fields:    event.Attributes,
+		Name: "bifer",
+		Tags: influxdbTags,
+		Fields: map[string]interface{}{
+			"value": 666,
+		},
 		Time:      time.Now(),
 		Precision: "s",
 	}
 	bps := client.BatchPoints{
 		Points:          make([]client.Point, 1),
-		Database:        MyDB,
+		Database:        p.databaseName,
 		RetentionPolicy: "default",
 	}
 	bps.Points[0] = point
-	_, err := con.Write(bps)
+	_, err := p.client.Write(bps)
 	if err != nil {
 		log.Printf("[error] sending check %s", event)
 		return

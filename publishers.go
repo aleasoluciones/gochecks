@@ -92,12 +92,11 @@ func NewInfluxdbPublisher(host string, port int, databaseName, username, passwor
 }
 
 func (p InfluxdbPublisher) PublishCheckResult(event Event) {
-	fmt.Println("tags >>>>", len(event.Tags))
 	point := client.Point{
-		Name: "production",
+		Name: "froga",
 		Tags: map[string]string{
-			"color": "8",
-			"shape": "3",
+			"color": "red",
+			"shape": "triangule",
 		},
 		Fields: map[string]interface{}{
 			"value": 666,
@@ -105,14 +104,13 @@ func (p InfluxdbPublisher) PublishCheckResult(event Event) {
 		Time:      time.Now(),
 		Precision: "s",
 	}
-	b, _ := json.Marshal(point)
-	fmt.Println("EGI>>>", b)
 	bps := client.BatchPoints{
 		Points:          make([]client.Point, 1),
 		Database:        p.databaseName,
 		RetentionPolicy: "default",
 	}
 	bps.Points[0] = point
+	fmt.Println("points >>>>>>", len(bps.Points))
 	_, err := p.client.Write(bps)
 	if err != nil {
 		log.Printf("[error] sending check %s", event)

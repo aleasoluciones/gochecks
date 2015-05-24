@@ -8,6 +8,7 @@ import (
 
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
+	"github.com/influxdb/influxdb/client"
 )
 
 type CheckPublisher interface {
@@ -59,6 +60,49 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 	riemannEvent := goryman.Event{Description: event.Description, Host: event.Host, Service: event.Service, State: event.State, Metric: event.Metric, Tags: event.Tags, Attributes: event.Attributes, Ttl: event.Ttl}
 
 	err = p.client.SendEvent(&riemannEvent)
+	if err != nil {
+		log.Printf("[error] sending check %s", event)
+		return
+	}
+}
+
+type InfluxdbPublisher struct {
+	client *client.Config
+}
+
+func NewInfluxdbPublisher(host, port, username, password string) InfluxdbPublisher {
+	u, err := url.Parse(fmt.Sprintf("http://%s:%d", host, port))
+	if err != nil {
+		log.Fatal(err)
+	}
+	conf := client.Config{
+		URL:      u,
+		Username: username,
+		Password: password,
+	}
+	con, err := client.NewClient(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	p := InfluxdbPublisher{&con}
+	return p
+}
+
+func (p InfluxdbPublisher) PublishCheckResult(event Event) {
+	point := client.Point{
+		Name:      "bifer",
+		Tags:      event.Tags,
+		Fields:    event.Attributes,
+		Time:      time.Now(),
+		Precision: "s",
+	}
+	bps := client.BatchPoints{
+		Points:          make([]client.Point, 1),
+		Database:        MyDB,
+		RetentionPolicy: "default",
+	}
+	bps.Points[0] = point
+	_, err := con.Write(bps)
 	if err != nil {
 		log.Printf("[error] sending check %s", event)
 		return

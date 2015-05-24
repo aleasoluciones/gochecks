@@ -97,7 +97,7 @@ func (p InfluxdbPublisher) PublishCheckResult(event Event) {
 		influxdbTags[value] = "0"
 	}
 	point := client.Point{
-		Name: "bifer",
+		Name: "felix",
 		Tags: influxdbTags,
 		Fields: map[string]interface{}{
 			"value": 666,

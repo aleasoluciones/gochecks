@@ -92,8 +92,9 @@ func NewInfluxdbPublisher(host string, port int, databaseName, username, passwor
 }
 
 func (p InfluxdbPublisher) PublishCheckResult(event Event) {
+	fmt.Println("tags >>>>", len(event.Tags))
 	point := client.Point{
-		Name: event.Tags[0],
+		Name: "production",
 		Tags: map[string]string{
 			"color": "8",
 			"shape": "3",

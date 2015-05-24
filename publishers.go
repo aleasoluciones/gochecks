@@ -105,6 +105,7 @@ func (p InfluxdbPublisher) PublishCheckResult(event Event) {
 		Time:      time.Now(),
 		Precision: "s",
 	}
+	fmt.Println("EGI>>>", point)
 	bps := client.BatchPoints{
 		Points:          make([]client.Point, 1),
 		Database:        p.databaseName,

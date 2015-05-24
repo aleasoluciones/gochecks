@@ -98,7 +98,11 @@ func (p InfluxdbPublisher) PublishCheckResult(event Event) {
 	}
 	point := client.Point{
 		Name: "felix",
-		Tags: influxdbTags,
+		//Tags: influxdbTags,
+		Tags: map[string]string{
+			"color": "8",
+			"shape": "3",
+		},
 		Fields: map[string]interface{}{
 			"value": 666,
 		},

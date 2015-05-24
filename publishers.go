@@ -73,7 +73,7 @@ type InfluxdbPublisher struct {
 	databaseName string
 }
 
-func NewInfluxdbPublisher(host, port, databaseName, username, password string) InfluxdbPublisher {
+func NewInfluxdbPublisher(host string, port int, databaseName, username, password string) InfluxdbPublisher {
 	u, err := url.Parse(fmt.Sprintf("http://%s:%d", host, port))
 	if err != nil {
 		log.Fatal(err)

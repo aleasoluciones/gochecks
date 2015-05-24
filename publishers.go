@@ -92,13 +92,8 @@ func NewInfluxdbPublisher(host string, port int, databaseName, username, passwor
 }
 
 func (p InfluxdbPublisher) PublishCheckResult(event Event) {
-	influxdbTags := make(map[string]string)
-	for _, value := range event.Tags {
-		influxdbTags[value] = "0"
-	}
 	point := client.Point{
-		Name: "felix",
-		//Tags: influxdbTags,
+		Name: event.Tags[0],
 		Tags: map[string]string{
 			"color": "8",
 			"shape": "3",

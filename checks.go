@@ -2,6 +2,7 @@ package felixcheck
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"strings"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/influxdb/influxdb/client"
 	"github.com/streadway/amqp"
 	"github.com/tatsushid/go-fastping"
 )
@@ -312,6 +314,66 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 		}
 		return Event{Host: host, Service: service, State: "ok"}
 	}
+}
+
+func NewInfluxdbClient(host string, port int, username, password string) *client.Client {
+	u, err := url.Parse(fmt.Sprintf("http://%s:%d", host, port))
+	if err != nil {
+		log.Fatal(err)
+	}
+	conf := client.Config{
+		URL:      *u,
+		Username: username,
+		Password: password,
+	}
+	client, err := client.NewClient(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return client
+}
+
+type InfluxdbQuerier struct {
+	client   *client.Client
+	query    string
+	database string
+}
+
+func NewInfluxdbQuerier(host string, port int, databaseName, username, password, query string) InfluxdbQuerier {
+
+	return InfluxdbQuerier{client: NewInfluxdbClient(host, port, username, password), query: query, database: databaseName}
+
+}
+
+func (i InfluxdbQuerier) MetricFunc() float32 {
+	res, err := i.queryDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	value := res[0].Series[0].Values[0][1]
+	fmt.Println("EGI >>>>>>>>>>>>", value)
+	result, _ := value.(float32)
+	return result
+
+}
+
+//func (i InfluxdbQuerier) StateFunc(value float32) string {
+
+//}
+
+func (i InfluxdbQuerier) queryDB() (res []client.Result, err error) {
+	q := client.Query{
+		Command:  i.query,
+		Database: i.database,
+	}
+	if response, err := i.client.Query(q); err == nil {
+		if response.Error() != nil {
+			return res, response.Error()
+		}
+		res = response.Results
+	}
+	return
+
 }
 
 type ObtainMetricFunction func() float32

@@ -3,15 +3,41 @@
 package felixcheck_test
 
 import (
+	"fmt"
 	"os"
-
 	"testing"
+
+	"net/http"
+	"net/http/httptest"
 
 	"github.com/streadway/amqp"
 
 	. "github.com/aleasoluciones/felixcheck"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestHttpCheckerWithHttpServerUp(t *testing.T) {
+	t.Parallel()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	check := NewHttpChecker("host", "service", ts.URL, 200)
+	checkResult := check()
+
+	assert.Equal(t, checkResult.State, "ok")
+}
+
+func TestHttpCheckerWithServerDown(t *testing.T) {
+	t.Parallel()
+
+	check := NewHttpChecker("host", "service", "https://unknownurl/", 200)
+	checkResult := check()
+
+	assert.Equal(t, checkResult.State, "critical")
+}
 
 func amqpUrlFromEnv() string {
 	url := os.Getenv("AMQP_URL")

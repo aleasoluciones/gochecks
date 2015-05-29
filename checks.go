@@ -2,7 +2,6 @@ package felixcheck
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"strings"
 	"time"

@@ -293,7 +293,13 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 
-		password, _ := u.User.Password()
+		if u.User == nil {
+			return Event{Host: host, Service: service, State: "critical", Description: "No user defined"}
+		}
+		password, hasPassword := u.User.Password()
+		if !hasPassword {
+			return Event{Host: host, Service: service, State: "critical", Description: "No password defined"}
+		}
 		hostAndPort := u.Host
 		if !strings.Contains(hostAndPort, ":") {
 			hostAndPort = hostAndPort + ":3306"

@@ -108,3 +108,12 @@ func TestRabbitMQQueueLenCheckReturnsCriticalWhenCantConnectToRabbitMQ(t *testin
 
 	assert.Equal(t, checkResult.State, "critical")
 }
+
+func TestMysqlConnectionErrorCheck(t *testing.T) {
+	t.Parallel()
+
+	check := NewMysqlConnectionCheck("host", "service", "mysql://nohost/nodb")
+	checkResult := check()
+
+	assert.Equal(t, checkResult.State, "critical")
+}

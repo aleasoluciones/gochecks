@@ -13,8 +13,7 @@ services:
   - rabbitmq
 
 env:
- - AMQP_URL=amqp://guest:guest@127.0.0.1:5672/
- - MYSQL_URL=mysql://root:@127.0.0.1:3306/test
+ - AMQP_URL=amqp://guest:guest@127.0.0.1:5672/ MYSQL_URL=mysql://root:@127.0.0.1:3306/test
 
 before_script:
   - mysql -e 'create database test;'

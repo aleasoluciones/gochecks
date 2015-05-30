@@ -27,7 +27,7 @@ func TestHttpCheckerWithHttpServerUp(t *testing.T) {
 	check := NewHttpChecker("host", "service", ts.URL, 200)
 	checkResult := check()
 
-	assert.Equal(t, checkResult.State, "ok")
+	assert.Equal(t, "ok", checkResult.State)
 }
 
 func TestHttpCheckerWithServerDown(t *testing.T) {
@@ -36,7 +36,7 @@ func TestHttpCheckerWithServerDown(t *testing.T) {
 	check := NewHttpChecker("host", "service", "https://unknownurl/", 200)
 	checkResult := check()
 
-	assert.Equal(t, checkResult.State, "critical")
+	assert.Equal(t, "critical", checkResult.State)
 }
 
 func amqpUrlFromEnv() string {
@@ -83,20 +83,20 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 
 	check := NewRabbitMQQueueLenCheck("host", "service", amqpUrl, queue, 2)
 	checkResult := check()
-	assert.Equal(t, checkResult.State, "ok")
-	assert.Equal(t, checkResult.Metric, float32(0))
+	assert.Equal(t, "ok", checkResult.State)
+	assert.Equal(t, float32(0), checkResult.Metric)
 
 	publishMessage(ch, exchange, routingKey, "msg1")
 	publishMessage(ch, exchange, routingKey, "msg2")
 
 	checkResult = check()
-	assert.Equal(t, checkResult.State, "ok")
-	assert.Equal(t, checkResult.Metric, float32(2))
+	assert.Equal(t, "ok", checkResult.State)
+	assert.Equal(t, float32(2), checkResult.Metric)
 
 	publishMessage(ch, exchange, routingKey, "msg3")
 	checkResult = check()
-	assert.Equal(t, checkResult.State, "critical")
-	assert.Equal(t, checkResult.Metric, float32(3))
+	assert.Equal(t, "critical", checkResult.State)
+	assert.Equal(t, float32(3), checkResult.Metric)
 
 }
 
@@ -106,7 +106,7 @@ func TestRabbitMQQueueLenCheckReturnsCriticalWhenCantConnectToRabbitMQ(t *testin
 	check := NewRabbitMQQueueLenCheck("host", "service", amqpUrlFromEnv()+"whatever", "queue", 2)
 	checkResult := check()
 
-	assert.Equal(t, checkResult.State, "critical")
+	assert.Equal(t, "critical", checkResult.State)
 }
 
 func TestMysqlConnectionErrorCheck(t *testing.T) {
@@ -115,7 +115,8 @@ func TestMysqlConnectionErrorCheck(t *testing.T) {
 	check := NewMysqlConnectionCheck("host", "service", "mysql://nohost/nodb")
 	checkResult := check()
 
-	assert.Equal(t, checkResult.State, "critical")
+	fmt.Println("EFA", checkResult)
+	assert.Equal(t, "critical", checkResult.State)
 }
 
 
@@ -125,5 +126,6 @@ func TestMysqlConnectionOkCheck(t *testing.T) {
 	check := NewMysqlConnectionCheck("host", "service", os.Getenv("MYSQL_URL"))
 	checkResult := check()
 
-	assert.Equal(t, checkResult.State, "ok")
+	fmt.Println("EFA", checkResult)
+	assert.Equal(t, "ok", checkResult.State)
 }

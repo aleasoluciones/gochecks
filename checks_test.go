@@ -115,10 +115,8 @@ func TestMysqlConnectionErrorCheck(t *testing.T) {
 	check := NewMysqlConnectionCheck("host", "service", "mysql://nohost/nodb")
 	checkResult := check()
 
-	fmt.Println("EFA", checkResult)
 	assert.Equal(t, "critical", checkResult.State)
 }
-
 
 func TestMysqlConnectionOkCheck(t *testing.T) {
 	t.Parallel()
@@ -126,6 +124,5 @@ func TestMysqlConnectionOkCheck(t *testing.T) {
 	check := NewMysqlConnectionCheck("host", "service", os.Getenv("MYSQL_URL"))
 	checkResult := check()
 
-	fmt.Println("EFA", checkResult)
 	assert.Equal(t, "ok", checkResult.State)
 }

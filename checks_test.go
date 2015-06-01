@@ -95,9 +95,9 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 
 	publishMessage(ch, exchange, routingKey, "msg3")
 	checkResult = check()
+
 	assert.Equal(t, "critical", checkResult.State)
 	assert.Equal(t, float32(3), checkResult.Metric)
-
 }
 
 func TestRabbitMQQueueLenCheckReturnsCriticalWhenCantConnectToRabbitMQ(t *testing.T) {

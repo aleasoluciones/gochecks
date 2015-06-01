@@ -28,6 +28,16 @@ Install
 go get github.com/aleasoluciones/felixcheck
 ```
 
+Development
+===========
+Export vars:
+MYSQL_URL=mysql://<user>:<pass>@<host>/<database>
+AMQP_URL=qmqp://<user>:<pass>@<host>/<vhost>
+
+```
+go test -tags integration -v ./...
+```
+
 Todo
 ====
  * Metric for all the checks

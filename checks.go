@@ -95,10 +95,12 @@ func NewTcpPortChecker(host, service, ip string, port int, conf TcpCheckerConf) 
 		var conn net.Conn
 
 		for attempt := 0; attempt < conf.retries; attempt++ {
+			var t1 = time.Now()
 			conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), conf.timeout)
 			if err == nil {
 				conn.Close()
-				return Event{Host: host, Service: service, State: "ok"}
+				milliseconds := float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
+				return Event{Host: host, Service: service, State: "ok", Metric: milliseconds}
 			}
 			time.Sleep(conf.retrytime)
 		}

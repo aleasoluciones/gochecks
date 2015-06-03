@@ -28,6 +28,7 @@ func TestHttpCheckerWithHttpServerUp(t *testing.T) {
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)
+	assert.InDelta(t, checkResult.Metric, 0, 100)
 }
 
 func TestHttpCheckerWithServerDown(t *testing.T) {
@@ -37,6 +38,7 @@ func TestHttpCheckerWithServerDown(t *testing.T) {
 	checkResult := check()
 
 	assert.Equal(t, "critical", checkResult.State)
+	assert.InDelta(t, checkResult.Metric, 0, 100)
 }
 
 func amqpUrlFromEnv() string {

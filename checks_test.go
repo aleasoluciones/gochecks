@@ -127,4 +127,5 @@ func TestMysqlConnectionOkCheck(t *testing.T) {
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)
+	assert.InDelta(t, checkResult.Metric, 0, 100)
 }

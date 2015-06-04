@@ -306,6 +306,7 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 		if !strings.Contains(hostAndPort, ":") {
 			hostAndPort = hostAndPort + ":3306"
 		}
+		var t1 = time.Now()
 		con, err := sql.Open("mysql", u.User.Username()+":"+password+"@"+"tcp("+hostAndPort+")"+u.Path)
 		defer con.Close()
 		if err != nil {
@@ -315,10 +316,11 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 		row := con.QueryRow(q)
 		var date string
 		err = row.Scan(&date)
+		milliseconds := float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
 		if err != nil {
-			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error(), Metric: milliseconds}
 		}
-		return Event{Host: host, Service: service, State: "ok"}
+		return Event{Host: host, Service: service, State: "ok", Metric: milliseconds}
 	}
 }
 

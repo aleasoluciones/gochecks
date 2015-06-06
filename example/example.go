@@ -21,6 +21,9 @@ func main() {
 	checkEngine.AddCheck(
 		felixcheck.NewSnmpChecker("localhost", "snmp", "127.0.0.1", "public", felixcheck.DefaultSnmpCheckConf),
 		period)
+	checkEngine.AddCheck(
+		felixcheck.NewPingChecker("nonexistinghost", "ping", "172.16.5.5").Retry(3, 1*time.Second),
+		period)
 
 	for {
 		time.Sleep(2 * time.Second)

@@ -51,6 +51,20 @@ func (f CheckFunction) Ttl(ttl float32) CheckFunction {
 	}
 }
 
+func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
+	return func() Event {
+		var result Event
+		for i := 0; i < times; i++ {
+			result = f()
+			if result.State == "ok" {
+				return result
+			}
+			time.Sleep(sleep)
+		}
+		return result
+	}
+}
+
 func NewPingChecker(host, service, ip string) CheckFunction {
 	return func() Event {
 		var retRtt time.Duration = 0

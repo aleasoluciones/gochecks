@@ -91,32 +91,17 @@ func NewPingChecker(host, service, ip string) CheckFunction {
 	}
 }
 
-type TcpCheckerConf struct {
-	retries   int
-	timeout   time.Duration
-	retrytime time.Duration
-}
-
-var DefaultTcpCheckConf = TcpCheckerConf{
-	retries:   3,
-	timeout:   2 * time.Second,
-	retrytime: 1 * time.Second,
-}
-
-func NewTcpPortChecker(host, service, ip string, port int, conf TcpCheckerConf) CheckFunction {
+func NewTcpPortChecker(host, service, ip string, port int, timeout time.Duration) CheckFunction {
 	return func() Event {
 		var err error
 		var conn net.Conn
 
-		for attempt := 0; attempt < conf.retries; attempt++ {
-			var t1 = time.Now()
-			conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), conf.timeout)
-			if err == nil {
-				conn.Close()
-				milliseconds := float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
-				return Event{Host: host, Service: service, State: "ok", Metric: milliseconds}
-			}
-			time.Sleep(conf.retrytime)
+		var t1 = time.Now()
+		conn, err = net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), timeout)
+		if err == nil {
+			conn.Close()
+			milliseconds := float32((time.Now().Sub(t1)).Nanoseconds() / 1e6)
+			return Event{Host: host, Service: service, State: "ok", Metric: milliseconds}
 		}
 		return Event{Host: host, Service: service, State: "critical"}
 	}

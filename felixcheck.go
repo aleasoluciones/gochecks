@@ -24,8 +24,8 @@ type CheckEngine struct {
 	publishersMutex sync.Mutex
 }
 
-func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
-	checkEngine := CheckEngine{[]CheckPublisher{checkPublisher}, make(chan Event), sync.Mutex{}}
+func NewCheckEngine() *CheckEngine {
+	checkEngine := CheckEngine{[]CheckPublisher{}, make(chan Event), sync.Mutex{}}
 	go func() {
 		for result := range checkEngine.results {
 			checkEngine.publishersMutex.Lock()
@@ -35,16 +35,22 @@ func NewCheckEngine(checkPublisher CheckPublisher) CheckEngine {
 			checkEngine.publishersMutex.Unlock()
 		}
 	}()
-	return checkEngine
+	return &checkEngine
 }
 
-func (ce CheckEngine) AddCheck(check CheckFunction, period time.Duration) {
+func (ce *CheckEngine) AddPublisher(publisher CheckPublisher) {
+	ce.publishersMutex.Lock()
+	ce.checkPublishers = append(ce.checkPublishers, publisher)
+	ce.publishersMutex.Unlock()
+}
+
+func (ce *CheckEngine) AddCheck(check CheckFunction, period time.Duration) {
 	scheduledtask.NewScheduledTask(func() {
 		ce.results <- check()
 	}, period, 0)
 }
 
-func (ce CheckEngine) AddMultiCheck(check MultiCheckFunction, period time.Duration) {
+func (ce *CheckEngine) AddMultiCheck(check MultiCheckFunction, period time.Duration) {
 	scheduledtask.NewScheduledTask(func() {
 		for _, result := range check() {
 			ce.results <- result

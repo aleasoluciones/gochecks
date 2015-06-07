@@ -7,7 +7,10 @@ import (
 )
 
 func main() {
-	checkEngine := felixcheck.NewCheckEngine(felixcheck.NewRiemannPublisher("127.0.0.1:5555"))
+	checkEngine := felixcheck.NewCheckEngine()
+	checkEngine.AddPublisher(felixcheck.NewRiemannPublisher("127.0.0.1:5555"))
+	checkEngine.AddPublisher(felixcheck.NewLogPublisher())
+
 	period := 5 * time.Second
 	googleCheck := felixcheck.NewGenericHttpChecker(
 		"google", "http",

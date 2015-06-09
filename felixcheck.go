@@ -38,6 +38,10 @@ func NewCheckEngine() *CheckEngine {
 	return &checkEngine
 }
 
+func (ce *CheckEngine) AddResult(event Event) {
+	ce.results <- event
+}
+
 func (ce *CheckEngine) AddPublisher(publisher CheckPublisher) {
 	ce.publishersMutex.Lock()
 	ce.checkPublishers = append(ce.checkPublishers, publisher)

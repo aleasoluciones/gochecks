@@ -1,7 +1,6 @@
 package felixcheck
 
 import (
-	"sync"
 	"time"
 
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
@@ -21,18 +20,15 @@ type Event struct {
 type CheckEngine struct {
 	checkPublishers []CheckPublisher
 	results         chan Event
-	publishersMutex sync.Mutex
 }
 
-func NewCheckEngine() *CheckEngine {
-	checkEngine := CheckEngine{[]CheckPublisher{}, make(chan Event), sync.Mutex{}}
+func NewCheckEngine(publishers []CheckPublisher) *CheckEngine {
+	checkEngine := CheckEngine{publishers, make(chan Event)}
 	go func() {
 		for result := range checkEngine.results {
-			checkEngine.publishersMutex.Lock()
 			for _, publisher := range checkEngine.checkPublishers {
 				publisher.PublishCheckResult(result)
 			}
-			checkEngine.publishersMutex.Unlock()
 		}
 	}()
 	return &checkEngine
@@ -40,12 +36,6 @@ func NewCheckEngine() *CheckEngine {
 
 func (ce *CheckEngine) AddResult(event Event) {
 	ce.results <- event
-}
-
-func (ce *CheckEngine) AddPublisher(publisher CheckPublisher) {
-	ce.publishersMutex.Lock()
-	ce.checkPublishers = append(ce.checkPublishers, publisher)
-	ce.publishersMutex.Unlock()
 }
 
 func (ce *CheckEngine) AddCheck(check CheckFunction, period time.Duration) {

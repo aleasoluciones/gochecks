@@ -30,7 +30,7 @@ func NewCheckEngine() *CheckEngine {
 		for result := range checkEngine.results {
 			checkEngine.publishersMutex.Lock()
 			for _, publisher := range checkEngine.checkPublishers {
-				go publisher.PublishCheckResult(result)
+				publisher.PublishCheckResult(result)
 			}
 			checkEngine.publishersMutex.Unlock()
 		}

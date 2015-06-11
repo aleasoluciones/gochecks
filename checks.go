@@ -1,4 +1,4 @@
-package felixcheck
+package gochecks
 
 import (
 	"fmt"

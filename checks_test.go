@@ -1,6 +1,6 @@
 // +build integration
 
-package felixcheck_test
+package gochecks_test
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/streadway/amqp"
 
-	. "github.com/aleasoluciones/felixcheck"
+	. "github.com/aleasoluciones/gochecks"
 	"github.com/stretchr/testify/assert"
 )
 

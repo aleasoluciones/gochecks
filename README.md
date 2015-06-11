@@ -1,8 +1,8 @@
-#felixcheck
-[![Build Status](https://travis-ci.org/aleasoluciones/felixcheck.svg?branch=master)](https://travis-ci.org/aleasoluciones/felixcheck)
-[![GoDoc](https://godoc.org/github.com/aleasoluciones/felixcheck?status.png)](http://godoc.org/github.com/aleasoluciones/felixcheck)
+#gochecks
+[![Build Status](https://travis-ci.org/aleasoluciones/gochecks.svg?branch=master)](https://travis-ci.org/aleasoluciones/gochecks)
+[![GoDoc](https://godoc.org/github.com/aleasoluciones/gochecks?status.png)](http://godoc.org/github.com/aleasoluciones/gochecks)
 
-felixcheck package provides utilities to check services health and publish events. 
+gochecks package provides utilities to check services health and publish events. 
 It is written fully in Go. 
 
 It includes:
@@ -25,7 +25,7 @@ Install
 =======
 
 ```
-go get github.com/aleasoluciones/felixcheck
+go get github.com/aleasoluciones/gochecks
 ```
 
 Development

@@ -55,7 +55,7 @@ func NewRiemannPublisher(addr string) RiemannPublisher {
 func (p RiemannPublisher) PublishCheckResult(event Event) {
 	err := p.client.Connect()
 	if err != nil {
-		log.Printf("[error] publishing check %s", event)
+		log.Println("[error] publishing check", event)
 		return
 	}
 	defer p.client.Close()
@@ -63,7 +63,7 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 
 	err = p.client.SendEvent(&riemannEvent)
 	if err != nil {
-		log.Printf("[error] sending check %s", event)
+		log.Println("[error] sending check", event)
 		return
 	}
 }
@@ -113,7 +113,7 @@ func (p InfluxdbPublisher) PublishCheckResult(event Event) {
 	fmt.Println("points >>>>>>", len(bps.Points))
 	_, err := p.client.Write(bps)
 	if err != nil {
-		log.Printf("[error] sending check %s", event)
+		log.Println("[error] sending check", event)
 		return
 	}
 }

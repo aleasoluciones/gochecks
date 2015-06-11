@@ -126,7 +126,6 @@ func BodyGreaterThan(minLength int) ValidateHttpResponseFunction {
 		} else {
 			return "ok", ""
 		}
-		return "critical", "unknown condition"
 	}
 }
 

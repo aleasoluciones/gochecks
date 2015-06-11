@@ -1,3 +1,4 @@
+
 #gochecks
 [![Build Status](https://travis-ci.org/aleasoluciones/gochecks.svg?branch=master)](https://travis-ci.org/aleasoluciones/gochecks)
 [![GoDoc](https://godoc.org/github.com/aleasoluciones/gochecks?status.png)](http://godoc.org/github.com/aleasoluciones/gochecks)
@@ -21,15 +22,14 @@ It includes:
   * [riemann](http://riemann.io/)
   * RabbitMQ / AMQP
 
-Install
-=======
+##Install
 
 ```
 go get github.com/aleasoluciones/gochecks
 ```
 
-Development
-===========
+##Development
+
 Export vars:
 MYSQL_URL=mysql://<user>:<pass>@<host>/<database>
 AMQP_URL=qmqp://<user>:<pass>@<host>/<vhost>
@@ -38,7 +38,5 @@ AMQP_URL=qmqp://<user>:<pass>@<host>/<vhost>
 go test -tags integration -v ./...
 ```
 
-Todo
-====
+##Todo
  * Metric for all the checks
- * Nagios output format

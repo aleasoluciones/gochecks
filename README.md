@@ -28,6 +28,26 @@ It includes:
 go get github.com/aleasoluciones/gochecks
 ```
 
+
+##Sample code
+
+Create a Checks Engine with two publisher (riemman and log)
+```
+checkEngine := gochecks.NewCheckEngine([]gochecks.CheckPublisher{
+    gochecks.NewRiemannPublisher("127.0.0.1:5555"),
+    gochecks.NewLogPublisher(),
+})
+```
+Add a periodic (20 seconds) http check with up to three retries, tagging the result as production and adding some attributes.
+```
+checkEngine.AddCheck(
+    gochecks.NewHttpChecker("golang", "http", "http://www.golang.org", 200).
+      Attributes(map[string]string{"version": "1", "network": "google"}).
+      Tags("production").
+      Retry(3, 1*time.Second),
+    20 * time.Second)
+```
+
 ##Development
 
 Export vars:

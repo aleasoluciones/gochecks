@@ -14,7 +14,7 @@ type Event struct {
 	Description string
 	Tags        []string
 	Attributes  map[string]string
-	Ttl         float32
+	TTL         float32
 }
 
 type CheckEngine struct {

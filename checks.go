@@ -46,7 +46,7 @@ func (f CheckFunction) Attributes(attributes map[string]string) CheckFunction {
 func (f CheckFunction) Ttl(ttl float32) CheckFunction {
 	return func() Event {
 		result := f()
-		result.Ttl = ttl
+		result.TTL = ttl
 		return result
 	}
 }
@@ -67,7 +67,7 @@ func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
 
 func NewPingChecker(host, service, ip string) CheckFunction {
 	return func() Event {
-		var retRtt time.Duration = 0
+		var retRtt time.Duration
 		var result Event = Event{Host: host, Service: service, State: "critical"}
 
 		p := fastping.NewPinger()
@@ -153,9 +153,8 @@ func NewHttpChecker(host, service, url string, expectedStatusCode int) CheckFunc
 		func(httpResp *http.Response) (string, string) {
 			if httpResp.StatusCode == expectedStatusCode {
 				return "ok", ""
-			} else {
-				return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
 			}
+			return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
 		})
 }
 
@@ -177,9 +176,8 @@ func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf) C
 		_, err := snmpGet(ip, community, []string{conf.oidToCheck}, conf.timeout, conf.retries)
 		if err == nil {
 			return Event{Host: host, Service: service, State: "ok", Description: err.Error()}
-		} else {
-			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
+		return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 	}
 }
 
@@ -200,9 +198,8 @@ func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp in
 				state = "ok"
 			}
 			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
-		} else {
-			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
+		return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 	}
 }
 
@@ -216,9 +213,8 @@ func getMaxValueFromSnmpWalk(oid, ip, community string) (uint, error) {
 			}
 		}
 		return max, nil
-	} else {
-		return 0, err
 	}
+	return 0, err
 }
 
 func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
@@ -230,9 +226,8 @@ func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp u
 				state = "ok"
 			}
 			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
-		} else {
-			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
+		return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 	}
 }
 
@@ -245,9 +240,8 @@ func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp ui
 				state = "ok"
 			}
 			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
-		} else {
-			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
+		return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 	}
 }
 

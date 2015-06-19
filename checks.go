@@ -16,6 +16,7 @@ import (
 
 import (
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -43,7 +44,7 @@ func (f CheckFunction) Attributes(attributes map[string]string) CheckFunction {
 	}
 }
 
-func (f CheckFunction) Ttl(ttl float32) CheckFunction {
+func (f CheckFunction) TTL(ttl float32) CheckFunction {
 	return func() Event {
 		result := f()
 		result.TTL = ttl

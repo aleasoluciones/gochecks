@@ -15,7 +15,7 @@ func main() {
 	googleCheck := gochecks.NewGenericHttpChecker(
 		"google", "http",
 		"http://www.google.com",
-		gochecks.BodyGreaterThan(10000)).Tags("production", "web").Ttl(50)
+		gochecks.BodyGreaterThan(10000)).Tags("production", "web").TTL(50)
 	checkEngine.AddCheck(googleCheck, period)
 	checkEngine.AddCheck(
 		gochecks.NewHttpChecker("golang", "http", "http://www.golang.org", 200).

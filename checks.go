@@ -69,7 +69,7 @@ func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
 func NewPingChecker(host, service, ip string) CheckFunction {
 	return func() Event {
 		var retRtt time.Duration
-		var result Event = Event{Host: host, Service: service, State: "critical"}
+		var result = Event{Host: host, Service: service, State: "critical"}
 
 		p := fastping.NewPinger()
 		p.MaxRTT = maxPingTime
@@ -194,7 +194,7 @@ func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp in
 					max = r.Value.(int)
 				}
 			}
-			var state string = "critical"
+			var state = "critical"
 			if max < maxAllowedTemp {
 				state = "ok"
 			}
@@ -222,7 +222,7 @@ func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp u
 	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.7", ip, community)
 		if err == nil {
-			var state string = "critical"
+			var state = "critical"
 			if max < maxAllowedTemp {
 				state = "ok"
 			}
@@ -236,7 +236,7 @@ func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp ui
 	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community)
 		if err == nil {
-			var state string = "critical"
+			var state = "critical"
 			if max < maxAllowedTemp {
 				state = "ok"
 			}
@@ -273,7 +273,7 @@ func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) Che
 			return result
 		}
 
-		var state string = "critical"
+		var state = "critical"
 		if queueInfo.Messages <= max {
 			state = "ok"
 		}
@@ -323,7 +323,7 @@ type CalculateStateFunction func(float32) string
 func NewGenericCheck(host, service string, metricFunc ObtainMetricFunction, stateFunc CalculateStateFunction) CheckFunction {
 	return func() Event {
 		value := metricFunc()
-		var state string = stateFunc(value)
+		var state = stateFunc(value)
 		return Event{Host: host, Service: service, State: state, Metric: value}
 	}
 }

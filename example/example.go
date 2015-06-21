@@ -12,13 +12,13 @@ func main() {
 		gochecks.NewLogPublisher(),
 	})
 	period := 5 * time.Second
-	googleCheck := gochecks.NewGenericHttpChecker(
+	googleCheck := gochecks.NewGenericHTTPChecker(
 		"google", "http",
 		"http://www.google.com",
 		gochecks.BodyGreaterThan(10000)).Tags("production", "web").TTL(50)
 	checkEngine.AddCheck(googleCheck, period)
 	checkEngine.AddCheck(
-		gochecks.NewHttpChecker("golang", "http", "http://www.golang.org", 200).
+		gochecks.NewHTTPChecker("golang", "http", "http://www.golang.org", 200).
 			Attributes(map[string]string{"version": "1", "network": "google"}).
 			Tags("production").
 			Retry(3, 1*time.Second),

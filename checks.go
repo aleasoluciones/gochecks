@@ -92,7 +92,7 @@ func NewPingChecker(host, service, ip string) CheckFunction {
 	}
 }
 
-func NewTcpPortChecker(host, service, ip string, port int, timeout time.Duration) CheckFunction {
+func NewTCPPortChecker(host, service, ip string, port int, timeout time.Duration) CheckFunction {
 	return func() Event {
 		var err error
 		var conn net.Conn
@@ -108,9 +108,9 @@ func NewTcpPortChecker(host, service, ip string, port int, timeout time.Duration
 	}
 }
 
-type ValidateHttpResponseFunction func(resp *http.Response) (state, description string)
+type ValidateHTTPResponseFunction func(resp *http.Response) (state, description string)
 
-func BodyGreaterThan(minLength int) ValidateHttpResponseFunction {
+func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {
 	return func(httpResp *http.Response) (state, description string) {
 		if httpResp.StatusCode != 200 {
 			return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
@@ -124,13 +124,12 @@ func BodyGreaterThan(minLength int) ValidateHttpResponseFunction {
 		}
 		if len(body) < minLength {
 			return "critical", fmt.Sprintf("Obtained %d bytes, expected more than %d", len(body), minLength)
-		} else {
-			return "ok", ""
 		}
+		return "ok", ""
 	}
 }
 
-func NewGenericHttpChecker(host, service, url string, validationFunc ValidateHttpResponseFunction) CheckFunction {
+func NewGenericHTTPChecker(host, service, url string, validationFunc ValidateHTTPResponseFunction) CheckFunction {
 	return func() Event {
 		var t1 = time.Now()
 
@@ -149,8 +148,8 @@ func NewGenericHttpChecker(host, service, url string, validationFunc ValidateHtt
 	}
 }
 
-func NewHttpChecker(host, service, url string, expectedStatusCode int) CheckFunction {
-	return NewGenericHttpChecker(host, service, url,
+func NewHTTPChecker(host, service, url string, expectedStatusCode int) CheckFunction {
+	return NewGenericHTTPChecker(host, service, url,
 		func(httpResp *http.Response) (string, string) {
 			if httpResp.StatusCode == expectedStatusCode {
 				return "ok", ""
@@ -232,7 +231,7 @@ func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp u
 	}
 }
 
-func NewJuniperCpuChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
+func NewJuniperCPUChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
 	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community)
 		if err == nil {

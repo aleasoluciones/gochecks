@@ -24,7 +24,7 @@ func TestHttpCheckerWithHttpServerUp(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	check := NewHttpChecker("host", "service", ts.URL, 200)
+	check := NewHTTPChecker("host", "service", ts.URL, 200)
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)
@@ -34,7 +34,7 @@ func TestHttpCheckerWithHttpServerUp(t *testing.T) {
 func TestHttpCheckerWithServerDown(t *testing.T) {
 	t.Parallel()
 
-	check := NewHttpChecker("host", "service", "https://unknownurl/", 200)
+	check := NewHTTPChecker("host", "service", "https://unknownurl/", 200)
 	checkResult := check()
 
 	assert.Equal(t, "critical", checkResult.State)

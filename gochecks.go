@@ -1,3 +1,6 @@
+// Package gochecks provide a monitoring checks engine to create or embbed
+// small monitoring system that can publish the periodic check result to
+// other monitoring plataforms
 package gochecks
 
 import (
@@ -6,6 +9,7 @@ import (
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 )
 
+// Check result event, very inspired and compatible with Riemann events
 type Event struct {
 	Host        string
 	Service     string

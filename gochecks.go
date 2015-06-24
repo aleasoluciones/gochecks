@@ -55,6 +55,8 @@ func (ce *CheckEngine) AddCheck(check CheckFunction, period time.Duration) {
 	}, period, 0)
 }
 
+// AddMultiCheck schedule a new multi check to be executed with the given period
+// the muli check can return an array of events/results
 func (ce *CheckEngine) AddMultiCheck(check MultiCheckFunction, period time.Duration) {
 	scheduledtask.NewScheduledTask(func() {
 		for _, result := range check() {

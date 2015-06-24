@@ -32,6 +32,7 @@ type RabbitMqPublisher struct {
 	publisher *simpleamqp.AmqpPublisher
 }
 
+// NewRabbitMqPublisher return a publisher to send to RabbitMq exchange
 func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	p := RabbitMqPublisher{simpleamqp.NewAmqpPublisher(amqpuri, exchange)}
 	return p

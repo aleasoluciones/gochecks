@@ -60,7 +60,6 @@ func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp strin
 		} else {
 			return []Event{Event{Host: host, Service: service, State: "critical", Description: err.Error()}}
 		}
-		return []Event{}
 	}
 
 }

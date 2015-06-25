@@ -2,6 +2,7 @@ package gochecks
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"encoding/json"
@@ -18,7 +19,7 @@ type JobsMessage struct {
 	Jobs []JobStatus `json:"jobs"`
 }
 
-func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string) MultiCheckFunction {
+func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp string) MultiCheckFunction {
 
 	return func() []Event {
 
@@ -43,14 +44,17 @@ func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string) MultiCheckFunct
 		err = json.Unmarshal(body, &jobs)
 		if err == nil {
 			for _, job := range jobs.Jobs {
-				state := "critical"
-				if strings.HasPrefix(job.Color, "blue") {
-					state = "ok"
+				matched, _ := regexp.MatchString(jobRegExp, job.Name)
+				if matched {
+					state := "critical"
+					if strings.HasPrefix(job.Color, "blue") {
+						state = "ok"
+					}
+					results = append(results, Event{
+						Host:    host,
+						Service: service + " " + job.Name,
+						State:   state})
 				}
-				results = append(results, Event{
-					Host:    host,
-					Service: service + " " + job.Name,
-					State:   state})
 			}
 			return results
 		} else {

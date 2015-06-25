@@ -2,6 +2,7 @@ package gochecks
 
 import (
 	"fmt"
+	"strings"
 
 	"encoding/json"
 	"io/ioutil"
@@ -43,7 +44,7 @@ func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string) MultiCheckFunct
 		if err == nil {
 			for _, job := range jobs.Jobs {
 				state := "critical"
-				if job.Color == "blue" {
+				if strings.HasPrefix(job.Color, "blue") {
 					state = "ok"
 				}
 				results = append(results, Event{

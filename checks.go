@@ -25,7 +25,9 @@ const (
 	maxPingTime = 4 * time.Second
 )
 
+// CheckFunction type for a function that return a event
 type CheckFunction func() Event
+// MultiCheckFunction type for a function that return an array of events
 type MultiCheckFunction func() []Event
 
 // Tags  returns a new check function that adds the given tags to the result
@@ -58,6 +60,9 @@ func (f CheckFunction) TTL(ttl float32) CheckFunction {
 	}
 }
 
+// Retry returns a new check funciont that execute the given function up to a given retry times or
+// until the first execution that returns a ok (whichever comes first). The new function will return
+// the event of the last execution
 func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
 	return func() Event {
 		var result Event

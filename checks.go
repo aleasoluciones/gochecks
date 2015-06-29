@@ -77,6 +77,7 @@ func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
 	}
 }
 
+// NewPingChecker returns a check function that can check if a host answer to a ICMP Ping
 func NewPingChecker(host, service, ip string) CheckFunction {
 	return func() Event {
 		var retRtt time.Duration

@@ -104,6 +104,7 @@ func NewPingChecker(host, service, ip string) CheckFunction {
 	}
 }
 
+// NewTCPPortChecker returns a check function that can check if a host have a tcp port open
 func NewTCPPortChecker(host, service, ip string, port int, timeout time.Duration) CheckFunction {
 	return func() Event {
 		var err error
@@ -120,6 +121,7 @@ func NewTCPPortChecker(host, service, ip string, port int, timeout time.Duration
 	}
 }
 
+// ValidateHTTPResponseFunction function type that should validate a http response and return the state (ok, critical, warning) and error description for a check. (Used with NewGenericHTTPChecker)
 type ValidateHTTPResponseFunction func(resp *http.Response) (state, description string)
 
 func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {

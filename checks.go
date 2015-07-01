@@ -162,6 +162,7 @@ func NewGenericHTTPChecker(host, service, url string, validationFunc ValidateHTT
 	}
 }
 
+// NewHTTPChecker returns a check function that get a given url and validate if the return code is the expected one
 func NewHTTPChecker(host, service, url string, expectedStatusCode int) CheckFunction {
 	return NewGenericHTTPChecker(host, service, url,
 		func(httpResp *http.Response) (string, string) {
@@ -183,6 +184,7 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 	timeout:    1 * time.Second,
 	oidToCheck: sysName,
 }
+
 
 func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf) CheckFunction {
 	return func() Event {

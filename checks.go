@@ -185,7 +185,7 @@ var DefaultSnmpCheckConf = SnmpCheckerConf{
 	oidToCheck: sysName,
 }
 
-
+// NewSnmpChecker returns a check function that check if a host respond to a snmp get query
 func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf) CheckFunction {
 	return func() Event {
 
@@ -197,6 +197,7 @@ func NewSnmpChecker(host, service, ip, community string, conf SnmpCheckerConf) C
 	}
 }
 
+// NewC4CMTSTempChecker returns a check function that check if any of the slot of a Arris C4 CMTS have a temperature above a given max
 func NewC4CMTSTempChecker(host, service, ip, community string, maxAllowedTemp int) CheckFunction {
 	return func() Event {
 

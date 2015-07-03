@@ -19,46 +19,47 @@ type JobsMessage struct {
 	Jobs []JobStatus `json:"jobs"`
 }
 
-func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp string) MultiCheckFunction {
+func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp string) CheckFunction {
 
-	return func() []Event {
+	return func() Event {
 
-		results := []Event{}
+		brokenJobs := []string{}
 
 		response, err := http.Get(jenkinsBaseUrl + "api/json?tree=jobs[name,color]")
 		if err != nil {
-			return []Event{Event{Host: host, Service: service, State: "critical", Description: err.Error()}}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 		if response.StatusCode != 200 {
-			return []Event{Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Response %d", response.StatusCode)}}
+			return Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Response %d", response.StatusCode)}
 		}
 		if response.Body == nil {
-			return []Event{Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Empty body")}}
+			return Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Empty body")}
 		}
 
 		body, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			return []Event{Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Error geting body")}}
+			return Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Error geting body")}
 		}
+
+		state := "ok"
+		jobsOk := 0
 		var jobs JobsMessage
 		err = json.Unmarshal(body, &jobs)
 		if err == nil {
 			for _, job := range jobs.Jobs {
 				matched, _ := regexp.MatchString(jobRegExp, job.Name)
 				if matched {
-					state := "critical"
-					if strings.HasPrefix(job.Color, "blue") {
-						state = "ok"
+					if !strings.HasPrefix(job.Color, "blue") {
+						state = "critical"
+						brokenJobs = append(brokenJobs, job.Name)
+					} else {
+						jobsOk = jobsOk + 1
 					}
-					results = append(results, Event{
-						Host:    host,
-						Service: service + " " + job.Name,
-						State:   state})
 				}
 			}
-			return results
+			return Event{Host: host, Service: service, State: state, Description: "Error " + strings.Join(brokenJobs, ","), Metric: jobsOk}
 		} else {
-			return []Event{Event{Host: host, Service: service, State: "critical", Description: err.Error()}}
+			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 	}
 

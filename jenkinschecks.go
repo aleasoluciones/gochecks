@@ -57,7 +57,7 @@ func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp strin
 					}
 				}
 			}
-			return Event{Host: host, Service: service, State: state, Description: "Error " + strings.Join(brokenJobs, ","), Metric: jobsOk}
+			return Event{Host: host, Service: service, State: state, Description: strings.Join(brokenJobs, ","), Metric: jobsOk}
 		} else {
 			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}

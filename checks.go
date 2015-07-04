@@ -234,6 +234,7 @@ func getMaxValueFromSnmpWalk(oid, ip, community string) (uint, error) {
 	return 0, err
 }
 
+// NewJuniperTempChecker returns a check function that check if a Juniper device (router, switch, etc) have a temperature above a given max
 func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
 	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.7", ip, community)
@@ -262,6 +263,7 @@ func NewJuniperCPUChecker(host, service, ip, community string, maxAllowedTemp ui
 	}
 }
 
+// NewRabbitMQQueueLenCheck returns a check function that check if queue have more pending messages than a given limit
 func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) CheckFunction {
 	return func() Event {
 		result := Event{Host: host, Service: service}

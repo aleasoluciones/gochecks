@@ -27,6 +27,7 @@ const (
 
 // CheckFunction type for a function that return a event
 type CheckFunction func() Event
+
 // MultiCheckFunction type for a function that return an array of events
 type MultiCheckFunction func() []Event
 
@@ -124,6 +125,7 @@ func NewTCPPortChecker(host, service, ip string, port int, timeout time.Duration
 // ValidateHTTPResponseFunction function type that should validate a http response and return the state (ok, critical, warning) and error description for a check. (Used with NewGenericHTTPChecker)
 type ValidateHTTPResponseFunction func(resp *http.Response) (state, description string)
 
+// BodyGreaterThan return a function that given a http response return true if the body is greater than a given number of bytes
 func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {
 	return func(httpResp *http.Response) (state, description string) {
 		if httpResp.StatusCode != 200 {
@@ -143,6 +145,7 @@ func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {
 	}
 }
 
+// NewGenercicHTTPChecker returns a check function that can check the returned http response of a http get with a given validation function
 func NewGenericHTTPChecker(host, service, url string, validationFunc ValidateHTTPResponseFunction) CheckFunction {
 	return func() Event {
 		var t1 = time.Now()

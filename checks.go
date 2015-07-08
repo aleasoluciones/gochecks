@@ -252,12 +252,13 @@ func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp u
 	}
 }
 
-func NewJuniperCPUChecker(host, service, ip, community string, maxAllowedTemp uint) CheckFunction {
+// NewJuniperCPUChecker returns a check function that check if a Juniper device (router, switch, etc) have a any cpu usage above a given percent
+func NewJuniperCPUChecker(host, service, ip, community string, maxAllowedCpuPercent uint) CheckFunction {
 	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community)
 		if err == nil {
 			var state = "critical"
-			if max < maxAllowedTemp {
+			if max < maxAllowedCpuPercent {
 				state = "ok"
 			}
 			return Event{Host: host, Service: service, State: state, Metric: float32(max)}
@@ -302,6 +303,7 @@ func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) Che
 	}
 }
 
+// NewMysqlConnectionCheck returns a check function to detect connection/credentials problems to connect to mysql
 func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 	return func() Event {
 		u, err := url.Parse(mysqluri)

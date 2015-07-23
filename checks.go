@@ -61,7 +61,7 @@ func (f CheckFunction) TTL(ttl float32) CheckFunction {
 	}
 }
 
-// Retry returns a new check funciont that execute the given function up to a given retry times or
+// Retry returns a new check function that execute the given function up to a given retry times or
 // until the first execution that returns a ok (whichever comes first). The new function will return
 // the event of the last execution
 func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
@@ -73,6 +73,40 @@ func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
 				return result
 			}
 			time.Sleep(sleep)
+		}
+		return result
+	}
+}
+
+// Retry returns a new check function that change the state to "critical" when the resulting metric is greater than a
+// threadshold and is not already "critical"
+func (f CheckFunction) CriticalIfGreaterThan(threshold float32) CheckFunction {
+	return func() Event {
+		var result Event
+		result = f()
+		if result.State == "critical" {
+			return result
+		}
+		if result.Metric.(float32) > threshold {
+			result.State = "critical"
+			return result
+		}
+		return result
+	}
+}
+
+// Retry returns a new check function that change the state to "warning" when the resulting metric is greater than a
+// threadshold and is not already "critical"
+func (f CheckFunction) WarningIfGreaterThan(threshold float32) CheckFunction {
+	return func() Event {
+		var result Event
+		result = f()
+		if result.State == "critical" {
+			return result
+		}
+		if result.Metric.(float32) > threshold {
+			result.State = "warning"
+			return result
 		}
 		return result
 	}

@@ -19,13 +19,13 @@ type JobsMessage struct {
 	Jobs []JobStatus `json:"jobs"`
 }
 
-func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp string) CheckFunction {
+func NewJenkinsJobsChecker(host, service, jenkinsBaseURL string, jobRegExp string) CheckFunction {
 
 	return func() Event {
 
 		brokenJobs := []string{}
 
-		response, err := http.Get(jenkinsBaseUrl + "api/json?tree=jobs[name,color]")
+		response, err := http.Get(jenkinsBaseURL + "api/json?tree=jobs[name,color]")
 		if err != nil {
 			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
@@ -58,9 +58,8 @@ func NewJenkinsJobsChecker(host, service, jenkinsBaseUrl string, jobRegExp strin
 				}
 			}
 			return Event{Host: host, Service: service, State: state, Description: strings.Join(brokenJobs, ","), Metric: jobsOk}
-		} else {
-			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
+		return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 	}
 
 }

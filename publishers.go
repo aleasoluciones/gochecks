@@ -48,11 +48,13 @@ type RiemannPublisher struct {
 	client *goryman.GorymanClient
 }
 
+// NewRiemannPublisher return a publisher to send directly to a riemann instance
 func NewRiemannPublisher(addr string) RiemannPublisher {
 	p := RiemannPublisher{goryman.NewGorymanClient(addr)}
 	return p
 }
 
+// PublishCheckResult return a publisher to send directly to a riemann instance
 func (p RiemannPublisher) PublishCheckResult(event Event) {
 	err := p.client.Connect()
 	if err != nil {

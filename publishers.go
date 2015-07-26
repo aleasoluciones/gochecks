@@ -3,14 +3,11 @@ package gochecks
 import (
 	"fmt"
 	"log"
-	"net/url"
-	"time"
 
 	"encoding/json"
 
 	"github.com/aleasoluciones/simpleamqp"
 	"github.com/bigdatadev/goryman"
-	"github.com/influxdb/influxdb/client"
 )
 
 type CheckPublisher interface {

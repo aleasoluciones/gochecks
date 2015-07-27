@@ -10,6 +10,7 @@ import (
 	"github.com/bigdatadev/goryman"
 )
 
+// CheckPublisher define the check result Publisher  
 type CheckPublisher interface {
 	PublishCheckResult(Event)
 }

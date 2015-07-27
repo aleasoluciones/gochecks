@@ -374,7 +374,10 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 	}
 }
 
+// ObtainMetricFunction function that return a metric value
 type ObtainMetricFunction func() float32
+
+// CalculateStateFunction function that given a metric generate the corresponding state value
 type CalculateStateFunction func(float32) string
 
 // NewGeneriocCheck returns a check function that invoke a given function to obtain a metric (metricFunc) and

@@ -210,12 +210,14 @@ func NewHTTPChecker(host, service, url string, expectedStatusCode int) CheckFunc
 		})
 }
 
+// SnmpCheckConf snmp connection parameters to use for the check
 type SnmpCheckerConf struct {
 	retries    int
 	timeout    time.Duration
 	oidToCheck string
 }
 
+// DefaultSnmpCheckConf default values for snmp conection parameters
 var DefaultSnmpCheckConf = SnmpCheckerConf{
 	retries:    1,
 	timeout:    1 * time.Second,

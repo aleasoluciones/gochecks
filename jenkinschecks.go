@@ -10,11 +10,13 @@ import (
 	"net/http"
 )
 
+// JobStatuss jenkins job status info
 type JobStatus struct {
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
 
+// JobsMessage jenkins jobs statuses
 type JobsMessage struct {
 	Jobs []JobStatus `json:"jobs"`
 }

@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	maxPingTime = 4 * time.Second
+	maxPingTime = 1 * time.Second
 )
 
 // CheckFunction type for a function that return a event

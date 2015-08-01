@@ -87,12 +87,12 @@ func NewJuniperTempChecker(host, service, ip, community string, maxAllowedTemp u
 }
 
 // NewJuniperCPUChecker returns a check function that check if a Juniper device (router, switch, etc) have a any cpu usage above a given percent
-func NewJuniperCPUChecker(host, service, ip, community string, maxAllowedCpuPercent uint) CheckFunction {
+func NewJuniperCPUChecker(host, service, ip, community string, maxAllowedCPUPercent uint) CheckFunction {
 	return func() Event {
 		max, err := getMaxValueFromSnmpWalk("1.3.6.1.4.1.2636.3.1.13.1.8", ip, community)
 		if err == nil {
 			var state = "critical"
-			if max < maxAllowedCpuPercent {
+			if max < maxAllowedCPUPercent {
 				state = "ok"
 			}
 			return Event{Host: host, Service: service, State: state, Metric: float32(max)}

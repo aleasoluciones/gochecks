@@ -31,7 +31,7 @@ func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {
 	}
 }
 
-// NewGenercicHTTPChecker returns a check function that can check the returned http response of a http get with a given validation function
+// NewGenericHTTPChecker returns a check function that can check the returned http response of a http get with a given validation function
 func NewGenericHTTPChecker(host, service, url string, validationFunc ValidateHTTPResponseFunction) CheckFunction {
 	return func() Event {
 		var t1 = time.Now()

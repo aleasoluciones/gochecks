@@ -8,7 +8,7 @@ const (
 	sysName = "1.3.6.1.2.1.1.5.0"
 )
 
-// SnmpCheckConf snmp connection parameters to use for the check
+// SnmpCheckerConf snmp connection parameters to use for the check
 type SnmpCheckerConf struct {
 	retries    int
 	timeout    time.Duration

@@ -9,7 +9,7 @@ import (
 	"github.com/aleasoluciones/goaleasoluciones/scheduledtask"
 )
 
-// Check result event, very inspired and compatible with Riemann events
+// Event is the check result, very inspired and compatible with Riemann events
 type Event struct {
 	Host        string
 	Service     string

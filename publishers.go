@@ -24,10 +24,12 @@ func NewLogPublisher() LogPublisher {
 	return LogPublisher{}
 }
 
+// PublishCheckResult log the event
 func (p LogPublisher) PublishCheckResult(event Event) {
 	log.Println(event)
 }
 
+// RabbitMqPublisher object to publish the event to a rabbitmq exchange
 type RabbitMqPublisher struct {
 	publisher *simpleamqp.AmqpPublisher
 }
@@ -38,12 +40,14 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 	return p
 }
 
+// PublishCheckResult publish the event to a configured rabbitmq exchange
 func (p RabbitMqPublisher) PublishCheckResult(event Event) {
 	topic := fmt.Sprintf("check.%s.%s", event.Host, event.Service)
 	serialized, _ := json.Marshal(event)
 	p.publisher.Publish(topic, serialized)
 }
 
+// RiemannPublisher object to publish events to a riemann server
 type RiemannPublisher struct {
 	client *goryman.GorymanClient
 }

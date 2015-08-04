@@ -10,14 +10,16 @@ import (
 	"github.com/bigdatadev/goryman"
 )
 
-// CheckPublisher define the check result Publisher  
+// CheckPublisher define the check result Publisher
 type CheckPublisher interface {
 	PublishCheckResult(Event)
 }
 
+// LogPublisher object to log each check result
 type LogPublisher struct {
 }
 
+// NewLogPublisher return a new LogPublisher
 func NewLogPublisher() LogPublisher {
 	return LogPublisher{}
 }

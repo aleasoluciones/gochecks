@@ -22,4 +22,5 @@ script:
   - go build
   - go test -tags integration ./...
   - go vet
+  - go lint
   - cd example; go build example.go

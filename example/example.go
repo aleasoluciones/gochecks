@@ -31,6 +31,8 @@ func main() {
 		gochecks.NewPingChecker("nonexistinghost", "ping", "172.16.5.5").Retry(3, 1*time.Second),
 		period)
 
+	checkEngine.AddCheck(gochecks.NewMysqlConnectionCheck("localhost", "mysql", ""), period)
+
 	for {
 		time.Sleep(2 * time.Second)
 	}

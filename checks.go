@@ -13,9 +13,10 @@ import (
 )
 
 import (
-	"database/sql"
-
+	// mysql driver import
 	_ "github.com/go-sql-driver/mysql"
+
+	"database/sql"
 )
 
 const (

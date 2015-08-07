@@ -76,6 +76,23 @@ func (f CheckFunction) Retry(times int, sleep time.Duration) CheckFunction {
 	}
 }
 
+// CriticalIfLessThan returns a new check function that change the state to "critical" when the resulting metric is less than a
+// threadshold and is not already "critical"
+func (f CheckFunction) CriticalIfLessThan(threshold float32) CheckFunction {
+	return func() Event {
+		var result Event
+		result = f()
+		if result.State == "critical" {
+			return result
+		}
+		if result.Metric.(float32) < threshold {
+			result.State = "critical"
+			return result
+		}
+		return result
+	}
+}
+
 // CriticalIfGreaterThan returns a new check function that change the state to "critical" when the resulting metric is greater than a
 // threadshold and is not already "critical"
 func (f CheckFunction) CriticalIfGreaterThan(threshold float32) CheckFunction {
@@ -87,6 +104,23 @@ func (f CheckFunction) CriticalIfGreaterThan(threshold float32) CheckFunction {
 		}
 		if result.Metric.(float32) > threshold {
 			result.State = "critical"
+			return result
+		}
+		return result
+	}
+}
+
+// WarningIfLessThan returns a new check function that change the state to "warning" when the resulting metric is less than a
+// threadshold and is not already "critical"
+func (f CheckFunction) WarningIfLessThan(threshold float32) CheckFunction {
+	return func() Event {
+		var result Event
+		result = f()
+		if result.State == "critical" {
+			return result
+		}
+		if result.Metric.(float32) < threshold {
+			result.State = "warning"
 			return result
 		}
 		return result

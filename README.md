@@ -8,6 +8,7 @@ It is written fully in Go.
 
 It includes:
  * checks scheduler
+ * add checks results
  * various checks:
    * Tcp port
    * ICMP/Ping
@@ -17,6 +18,7 @@ It includes:
    * Arris C4 CMTS temp
    * JunOS devices cpu usage and temp
    * MySQL connectivity
+   * Jenkins jobs status
 
  * Publishers:
   * [riemann](http://riemann.io/)

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	RIEMANN_DESCRIPTION_MAX_LENGTH = 250
+	RiemannDescriptionMaxLength = 250
 )
 
 // CheckPublisher define the check result Publisher
@@ -80,8 +80,8 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 }
 
 func (p RiemannPublisher) normalizeDescriptionLength(description string) string {
-	if len(description) < RIEMANN_DESCRIPTION_MAX_LENGTH {
+	if len(description) < RiemannDescriptionMaxLength {
 		return description
 	}
-	return description[0:RIEMANN_DESCRIPTION_MAX_LENGTH]
+	return description[0:RiemannDescriptionMaxLength]
 }

@@ -261,18 +261,25 @@ func NewMysqlConnectionCheck(host, service, mysqluri string) CheckFunction {
 	}
 }
 
-// ObtainMetricFunction function that return a metric value
-type ObtainMetricFunction func() float32
+// ObtainMetricFunction function that return a metric value or error
+type ObtainMetricFunction func() (float32, error)
 
-// CalculateStateFunction function that given a metric generate the corresponding state value
-type CalculateStateFunction func(float32) string
+// CalculateStateFunction function that given a metric and error generate the corresponding state value and description
+type CalculateStateFunction func(float32, error) (string, string)
 
 // NewGenericCheck returns a check function that invoke a given function to obtain a metric (metricFunc) and
 // invoke another function (stateFunc) to calculate the resulting state and description from this metric value
 func NewGenericCheck(host, service string, metricFunc ObtainMetricFunction, stateFunc CalculateStateFunction) CheckFunction {
 	return func() Event {
-		value := metricFunc()
-		var state = stateFunc(value)
-		return Event{Host: host, Service: service, State: state, Metric: value}
+		value, err := metricFunc()
+		var state, description = stateFunc(value, err)
+		return Event{Host: host, Service: service, State: state, Metric: value, Description: description}
 	}
+}
+
+func CriticalIfError(value float32, err error) (string, string) {
+	if err != nil {
+		return "critical", err.Error()
+	}
+	return "ok", ""
 }

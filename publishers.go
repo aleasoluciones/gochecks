@@ -20,8 +20,7 @@ type CheckPublisher interface {
 }
 
 // LogPublisher object to log each check result
-type LogPublisher struct {
-}
+type LogPublisher struct{}
 
 // NewLogPublisher return a new LogPublisher
 func NewLogPublisher() LogPublisher {
@@ -31,6 +30,20 @@ func NewLogPublisher() LogPublisher {
 // PublishCheckResult log the event
 func (p LogPublisher) PublishCheckResult(event Event) {
 	log.Println(event)
+}
+
+type ChannelPublisher struct {
+	Channel <-chan Event
+}
+
+// NewChannelPublisher return a new ChannelPublisher
+func NewChannelPublisher(c <-chan Event) ChannelPublisher {
+	return ChannelPublisher(c)
+}
+
+// PublishCheckResult send the event to the publisher channel
+func (p ChannelPublisher) PublishCheckResult(event Event) {
+	p.Channel <- event
 }
 
 // RabbitMqPublisher object to publish the event to a rabbitmq exchange

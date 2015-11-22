@@ -33,12 +33,12 @@ func (p LogPublisher) PublishCheckResult(event Event) {
 }
 
 type ChannelPublisher struct {
-	Channel <-chan Event
+	Channel chan Event
 }
 
 // NewChannelPublisher return a new ChannelPublisher
-func NewChannelPublisher(c <-chan Event) ChannelPublisher {
-	return ChannelPublisher(c)
+func NewChannelPublisher(c chan Event) ChannelPublisher {
+	return ChannelPublisher{c}
 }
 
 // PublishCheckResult send the event to the publisher channel

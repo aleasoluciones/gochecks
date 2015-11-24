@@ -32,6 +32,7 @@ func (p LogPublisher) PublishCheckResult(event Event) {
 	log.Println(event)
 }
 
+// ChannelPublisher object to publish to a channel each check result
 type ChannelPublisher struct {
 	Channel chan Event
 }

@@ -277,6 +277,7 @@ func NewGenericCheck(host, service string, metricFunc ObtainMetricFunction, stat
 	}
 }
 
+// CriticalIfError returns state critical when error, ok otherwise
 func CriticalIfError(value float32, err error) (string, string) {
 	if err != nil {
 		return "critical", err.Error()

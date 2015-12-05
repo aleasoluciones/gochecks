@@ -1,19 +1,21 @@
 package gochecks
 
 import (
+	"encoding/json"
 	"github.com/aleasoluciones/simpleamqp"
 )
 
-func amqp2CheckEngine(checkEngine *CheckEngine, exchange, topic, queue string, queueOptions *simpleamqp.QueueOptions) {
+func amqp2CheckEngine(checkEngine *CheckEngine, brokerURI, exchange, topic, queue string, queueOptions *simpleamqp.QueueOptions) {
 
-	if !queueOptions {
-		queueOptions := simpleamqp.QueueOptions{Durable: false, Delete: true, Exclusive: true}
+	if queueOptions == nil {
+		queueOptions = &simpleamqp.QueueOptions{Durable: false, Delete: true, Exclusive: true}
 	}
-	amqpEvents := amqpConsumer.ReceiveWithoutTimeout(exchange, []string{topic}, queue, queueOptions)
+	amqpConsumer := simpleamqp.NewAmqpConsumer(brokerURI)
+	amqpEvents := amqpConsumer.ReceiveWithoutTimeout(exchange, []string{topic}, queue, *queueOptions)
 
 	for ev := range amqpEvents {
-		event := Event
-		err = json.Unmarshal([]byte(ev.Body), &event)
+		event := Event{}
+		json.Unmarshal([]byte(ev.Body), &event)
 		checkEngine.AddResult(event)
 	}
 }

@@ -31,6 +31,25 @@ func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {
 	}
 }
 
+// ValidateContentFunctio function type that should validate a content (usualy a http body) and return the state (ok, critical, warning) and error description for a check.
+type ValidateContentFunction func(content string) (state, description string)
+
+func BodyValidation(bodyValidationFunc ValidateContentFunction) ValidateHTTPResponseFunction {
+	return func(httpResp *http.Response) (state, description string) {
+		if httpResp.StatusCode != 200 {
+			return "critical", fmt.Sprintf("Response %d", httpResp.StatusCode)
+		}
+		if httpResp.Body == nil {
+			return "critical", fmt.Sprintf("Empty body")
+		}
+		body, err := ioutil.ReadAll(httpResp.Body)
+		if err != nil {
+			return "critical", fmt.Sprintf("Error geting body")
+		}
+		return bodyValidationFunc(string(body))
+	}
+}
+
 // NewGenericHTTPChecker returns a check function that can check the returned http response of a http get with a given validation function
 func NewGenericHTTPChecker(host, service, url string, validationFunc ValidateHTTPResponseFunction) CheckFunction {
 	return func() Event {

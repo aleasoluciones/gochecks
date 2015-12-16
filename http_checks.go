@@ -34,6 +34,7 @@ func BodyGreaterThan(minLength int) ValidateHTTPResponseFunction {
 // ValidateContentFunctio function type that should validate a content (usualy a http body) and return the state (ok, critical, warning) and error description for a check.
 type ValidateContentFunction func(content string) (state, description string)
 
+// BodyValidation return a ValidationHTTPResponseFunction that check the body of a http response using the given bodyValidationFunc
 func BodyValidation(bodyValidationFunc ValidateContentFunction) ValidateHTTPResponseFunction {
 	return func(httpResp *http.Response) (state, description string) {
 		if httpResp.StatusCode != 200 {

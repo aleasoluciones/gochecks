@@ -2,6 +2,7 @@ package gochecks
 
 import (
 	"fmt"
+	"strings"
 	"log"
 
 	"encoding/json"

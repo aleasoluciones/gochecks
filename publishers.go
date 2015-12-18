@@ -60,7 +60,8 @@ func NewRabbitMqPublisher(amqpuri, exchange string) RabbitMqPublisher {
 
 // PublishCheckResult publish the event to a configured rabbitmq exchange
 func (p RabbitMqPublisher) PublishCheckResult(event Event) {
-	topic := fmt.Sprintf("check.%s.%s", event.Host, event.Service)
+	service := strings.Replace(event.Service, " ", ".", -1)
+	topic := fmt.Sprintf("check.%s.%s", event.Host, service)
 	serialized, _ := json.Marshal(event)
 	p.publisher.Publish(topic, serialized)
 }

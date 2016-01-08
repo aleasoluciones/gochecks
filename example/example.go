@@ -25,9 +25,6 @@ func main() {
 		period)
 
 	checkEngine.AddCheck(
-		gochecks.NewSnmpChecker("localhost", "snmp", "127.0.0.1", "public", gochecks.DefaultSnmpCheckConf),
-		period)
-	checkEngine.AddCheck(
 		gochecks.NewPingChecker("nonexistinghost", "ping", "172.16.5.5").Retry(3, 1*time.Second),
 		period)
 

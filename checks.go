@@ -277,6 +277,15 @@ func NewGenericCheck(host, service string, metricFunc ObtainMetricFunction, stat
 	}
 }
 
+// NewHeartbeatCheck returns a check function which returns a Event
+func NewHeartbeatCheck(host, service string) CheckFunction {
+	return func() Event {
+		var value float32
+		var description string
+		return Event{Host: host, Service: service, State: "ok", Metric: value, Description: description}
+	}
+}
+
 // CriticalIfError returns state critical when error, ok otherwise
 func CriticalIfError(value float32, err error) (string, string) {
 	if err != nil {

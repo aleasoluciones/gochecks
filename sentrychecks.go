@@ -13,7 +13,7 @@ func NewSentryUnresolvedIssuesChecker(host, service, sentryBaseUrl, projectName 
 			return Event{Host: host, Service: service, State: "critical", Description: err.Error()}
 		}
 		defer response.Body.Close()
-		if response.StatusCode != http.StatusOk {
+		if response.StatusCode != http.StatusOK {
 			return Event{Host: host, Service: service, State: "critical", Description: fmt.Sprintf("Response %d", response.StatusCode)}
 		}
 		decoder := json.NewDecoder(response.Body)
@@ -24,7 +24,7 @@ func NewSentryUnresolvedIssuesChecker(host, service, sentryBaseUrl, projectName 
 		}
 		state := "ok"
 		if len(unresolvedIssues) != 0 {
-			state := "critical"
+			state = "critical"
 		}
 		return Event{Host: host, Service: service, State: state, Metric: len(unresolvedIssues)}
 	}

@@ -5,6 +5,8 @@ go:
  - 1.6
  - tip
 
+sudo: false
+
 before_install:
   - go get -v ./...
   - go get github.com/stretchr/testify/assert
@@ -20,8 +22,5 @@ before_script:
   - mysql -e 'create database test;'
 
 script:
-  - go build
-  - go test -tags integration ./...
-  - go vet
-  - golint
+  - make all
   - cd example; go build example.go

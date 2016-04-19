@@ -7,11 +7,6 @@ go:
 
 sudo: false
 
-before_install:
-  - go get -v ./...
-  - go get github.com/stretchr/testify/assert
-  - go get -u github.com/golang/lint/golint
-
 services:
   - rabbitmq
 

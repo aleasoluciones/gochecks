@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/aleasoluciones/gochecks.svg?branch=master)](https://travis-ci.org/aleasoluciones/gochecks)
 [![GoDoc](https://godoc.org/github.com/aleasoluciones/gochecks?status.png)](http://godoc.org/github.com/aleasoluciones/gochecks)
 
-gochecks package provides utilities to check services health and publish events. 
-It is written fully in Go. 
+gochecks package provides utilities to check services health and publish events.
+It is written fully in Go.
 
 It includes:
  * checks scheduler
@@ -54,7 +54,7 @@ checkEngine.AddCheck(
 
 Export vars:
 MYSQL_URL=mysql://<user>:<pass>@<host>/<database>
-AMQP_URL=qmqp://<user>:<pass>@<host>/<vhost>
+AMQP_URL=amqp://<user>:<pass>@<host>/<vhost>
 
 ```
 go test -tags integration -v ./...

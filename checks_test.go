@@ -12,7 +12,9 @@ import (
 
 	"github.com/streadway/amqp"
 
-	. "github.com/aleasoluciones/gochecks"
+	. "."
+
+	//	. "github.com/aleasoluciones/gochecks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -100,6 +102,52 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 
 	assert.Equal(t, "critical", checkResult.State)
 	assert.Equal(t, float32(3), checkResult.Metric)
+}
+
+func TestRabbitMQQueueListLenCheck(t *testing.T) {
+	t.Parallel()
+	amqpUrl := amqpUrlFromEnv()
+	queue1 := "q1"
+	queue2 := "q2"
+	queues := []string{queue1, queue2}
+	exchange := "e"
+	routingKey1 := "r1"
+	routingKey2 := "r2"
+
+	conn, _ := amqp.Dial(amqpUrl)
+	ch, _ := conn.Channel()
+	defer conn.Close()
+	defer ch.Close()
+
+	ch.ExchangeDeclare(exchange, "topic", true, false, false, false, nil)
+	ch.QueueDelete(queue1, false, false, true)
+	ch.QueueDelete(queue2, false, false, true)
+	ch.QueueDeclare(queue1, false, false, false, false, nil)
+	ch.QueueDeclare(queue2, false, false, false, false, nil)
+	ch.QueueBind(queue1, "r1", exchange, false, nil)
+	ch.QueueBind(queue2, "r2", exchange, false, nil)
+
+	check := NewRabbitMQQueueListLenCheck("host", "service", amqpUrl, queues, 6)
+	checkResult := check()
+	assert.Equal(t, "ok", checkResult.State)
+	assert.Equal(t, float32(0), checkResult.Metric)
+
+	publishMessage(ch, exchange, routingKey1, "msg1")
+	publishMessage(ch, exchange, routingKey1, "msg1")
+	publishMessage(ch, exchange, routingKey2, "msg2")
+	publishMessage(ch, exchange, routingKey2, "msg2")
+
+	checkResult = check()
+	assert.Equal(t, "ok", checkResult.State)
+	assert.Equal(t, float32(4), checkResult.Metric)
+
+	publishMessage(ch, exchange, routingKey1, "msg3")
+	publishMessage(ch, exchange, routingKey2, "msg6")
+	publishMessage(ch, exchange, routingKey1, "msg7")
+	checkResult = check()
+
+	assert.Equal(t, "critical", checkResult.State)
+	assert.Equal(t, float32(7), checkResult.Metric)
 }
 
 func TestRabbitMQQueueLenCheckReturnsCriticalWhenCantConnectToRabbitMQ(t *testing.T) {

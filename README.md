@@ -52,11 +52,18 @@ checkEngine.AddCheck(
 
 ##Development
 
-Export vars:
+To pass the integration tests you need to execute a MySQL server and a RabbitMQ Server and export the corresponding vars:
+
 MYSQL_URL=mysql://<user>:<pass>@<host>/<database>
 AMQP_URL=amqp://<user>:<pass>@<host>/<vhost>
 
+Example:
 ```
+docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpass -d mysql
+export MYSQL_URL=mysql://root:rootpass@localhost/mysql
+docker run -p 5672:5672 -d rabbitmq
+export AMQP_URL=amqp://guest:guest@127.0.0.1:5672/
+
 go test -tags integration -v ./...
 ```
 

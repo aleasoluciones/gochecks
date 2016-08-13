@@ -4,6 +4,7 @@ package gochecks_test
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -73,7 +74,10 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 	exchange := "e"
 	routingKey := "r"
 
-	conn, _ := amqp.Dial(amqpUrl)
+	conn, err := amqp.Dial(amqpUrl)
+	if (err != nil){
+		log.Panic("Connection error RammbitMQ ", amqpUrl)
+	}
 	ch, _ := conn.Channel()
 	defer conn.Close()
 	defer ch.Close()

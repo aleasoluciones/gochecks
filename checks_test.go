@@ -75,7 +75,7 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 	routingKey := "r"
 
 	conn, err := amqp.Dial(amqpUrl)
-	if (err != nil){
+	if err != nil {
 		log.Panic("Connection error RammbitMQ ", amqpUrl)
 	}
 	ch, _ := conn.Channel()
@@ -128,6 +128,25 @@ func TestMysqlConnectionOkCheck(t *testing.T) {
 	t.Parallel()
 
 	check := NewMysqlConnectionCheck("host", "service", os.Getenv("MYSQL_URL"))
+	checkResult := check()
+
+	assert.Equal(t, "ok", checkResult.State)
+	assert.InDelta(t, checkResult.Metric, 0, 100)
+}
+
+func TestPostgresConnectionErrorCheck(t *testing.T) {
+	t.Parallel()
+	postgres_url := "postgres://wronguser:wrongpass@localhost/postgres"
+	check := NewPostgresConnectionCheck("host", "service", postgres_url)
+	checkResult := check()
+
+	assert.Equal(t, "critical", checkResult.State)
+}
+
+func TestPostgresOkCheck(t *testing.T) {
+	t.Parallel()
+
+	check := NewPostgresConnectionCheck("host", "service", os.Getenv("POSTGRES_URL"))
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)

@@ -12,9 +12,7 @@ services:
   - docker
 
 env:
- - AMQP_URL=amqp://guest:guest@127.0.0.1:5672/
- - MYSQL_URL=mysql://root:@localhost/mysql
- - POSTGRES_URL=postgres://postgres:mysecretpassword@localhost/postgres?sslmode=disable
+ - AMQP_URL=amqp://guest:guest@127.0.0.1:5672/ MYSQL_URL=mysql://root:@localhost/mysql POSTGRES_URL=postgres://postgres:mysecretpassword@localhost/postgres?sslmode=disable
 
 before_script:
   - docker run -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=rootpass -d mysql

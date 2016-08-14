@@ -188,6 +188,45 @@ func NewTCPPortChecker(host, service, ip string, port int, timeout time.Duration
 	}
 }
 
+func NewRabbitMQQueueListLenCheck(host, service, amqpuri string, queues []string, max int) CheckFunction {
+	return func() Event {
+		result := Event{Host: host, Service: service}
+
+		conn, err := amqp.Dial(amqpuri)
+		if err != nil {
+			result.State = "critical"
+			result.Description = err.Error()
+			return result
+		}
+
+		ch, err := conn.Channel()
+		if err != nil {
+			result.State = "critical"
+			result.Description = err.Error()
+			return result
+		}
+		defer ch.Close()
+		defer conn.Close()
+		var totalMessages int
+
+		for _, queue := range queues {
+			queueInfo, err := ch.QueueInspect(queue)
+			if err != nil {
+				result.State = "critical"
+				result.Description = err.Error()
+				return result
+			}
+			totalMessages += queueInfo.Messages
+		}
+
+		var state = "critical"
+		if totalMessages <= max {
+			state = "ok"
+		}
+		return Event{Host: host, Service: service, State: state, Metric: float32(totalMessages)}
+	}
+}
+
 // NewRabbitMQQueueLenCheck returns a check function that check if queue have more pending messages than a given limit
 func NewRabbitMQQueueLenCheck(host, service, amqpuri, queue string, max int) CheckFunction {
 	return func() Event {

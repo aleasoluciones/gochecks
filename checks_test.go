@@ -4,6 +4,7 @@ package gochecks_test
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -14,7 +15,6 @@ import (
 
 	. "."
 
-	//	. "github.com/aleasoluciones/gochecks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,7 +75,10 @@ func TestRabbitMQQueueLenCheck(t *testing.T) {
 	exchange := "e"
 	routingKey := "r"
 
-	conn, _ := amqp.Dial(amqpUrl)
+	conn, err := amqp.Dial(amqpUrl)
+	if err != nil {
+		log.Panic("Connection error RammbitMQ ", amqpUrl)
+	}
 	ch, _ := conn.Channel()
 	defer conn.Close()
 	defer ch.Close()
@@ -110,11 +113,14 @@ func TestRabbitMQQueueListLenCheck(t *testing.T) {
 	queue1 := "q1"
 	queue2 := "q2"
 	queues := []string{queue1, queue2}
-	exchange := "e"
+	exchange := "e1"
 	routingKey1 := "r1"
 	routingKey2 := "r2"
 
-	conn, _ := amqp.Dial(amqpUrl)
+	conn, err := amqp.Dial(amqpUrl)
+	if err != nil {
+		log.Panic("Connection error RammbitMQ ", amqpUrl)
+	}
 	ch, _ := conn.Channel()
 	defer conn.Close()
 	defer ch.Close()
@@ -170,8 +176,26 @@ func TestMysqlConnectionErrorCheck(t *testing.T) {
 
 func TestMysqlConnectionOkCheck(t *testing.T) {
 	t.Parallel()
-
 	check := NewMysqlConnectionCheck("host", "service", os.Getenv("MYSQL_URL"))
+	checkResult := check()
+
+	assert.Equal(t, "ok", checkResult.State)
+	assert.InDelta(t, checkResult.Metric, 0, 100)
+}
+
+func TestPostgresConnectionErrorCheck(t *testing.T) {
+	t.Parallel()
+	postgres_url := "postgres://wronguser:wrongpass@localhost/postgres"
+	check := NewPostgresConnectionCheck("host", "service", postgres_url)
+	checkResult := check()
+
+	assert.Equal(t, "critical", checkResult.State)
+}
+
+func TestPostgresOkCheck(t *testing.T) {
+	t.Parallel()
+
+	check := NewPostgresConnectionCheck("host", "service", os.Getenv("POSTGRES_URL"))
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)

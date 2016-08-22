@@ -1,3 +1,4 @@
+sudo: required
 
 language: go
 go:
@@ -5,16 +6,29 @@ go:
  - 1.6
  - tip
 
+
 sudo: false
 
 services:
-  - rabbitmq
+  - docker
 
 env:
- - AMQP_URL=amqp://guest:guest@127.0.0.1:5672/ MYSQL_URL=mysql://root:@127.0.0.1:3306/test
+ - AMQP_URL=amqp://guest:guest@localhost:5673/ MYSQL_URL=mysql://root:rootpass@localhost:3307/mysql POSTGRES_URL=postgres://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable
 
 before_script:
-  - mysql -e 'create database test;'
+  - docker run -p 3307:3306 --name mysql -e MYSQL_ROOT_PASSWORD=rootpass -d mysql
+  - docker run -p 5433:5432 --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres:9.5
+  - docker run -p 5673:5672 --name rabbitmq -d rabbitmq
+  - docker ps
+
+after_script:
+  - docker stop mysql
+  - docker rm mysql
+  - docker stop postgres
+  - docker rm postgres
+  - docker stop rabbitmq
+  - docker rm rabbitmq
+  - docker ps
 
 script:
   - make all

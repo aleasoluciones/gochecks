@@ -11,7 +11,7 @@ import (
 
 	"github.com/streadway/amqp"
 
-	. "."
+	. "github.com/aleasoluciones/gochecks"
 
 	"github.com/stretchr/testify/assert"
 )

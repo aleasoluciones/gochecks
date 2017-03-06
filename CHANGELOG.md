@@ -1,3 +1,7 @@
+2017-03-06
+==========
+* Internal: https://github.com/bigdatadev/goryman disappeared. Change dependency
+
 2016-10-26
 ==========
 * Internal: Added go 1.7 version to travis

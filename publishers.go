@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 
 	"github.com/aleasoluciones/simpleamqp"
-	"github.com/bigdatadev/goryman"
+	"github.com/jsoriano/goryman"
 )
 
 const (
@@ -86,7 +86,14 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 		return
 	}
 	defer p.client.Close()
-	riemannEvent := goryman.Event{Description: p.normalizeDescriptionLength(event.Description), Host: event.Host, Service: event.Service, State: event.State, Metric: event.Metric, Tags: event.Tags, Attributes: event.Attributes, Ttl: event.TTL}
+	riemannEvent := goryman.Event{Description: p.normalizeDescriptionLength(event.Description),
+		Host: event.Host,
+		Service: event.Service,
+		State: event.State,
+		Metric: event.Metric,
+		Tags: event.Tags,
+		Attributes: event.Attributes,
+		Ttl: event.TTL}
 
 	err = p.client.SendEvent(&riemannEvent)
 	if err != nil {

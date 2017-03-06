@@ -8,11 +8,6 @@ import (
 	"encoding/json"
 
 	"github.com/aleasoluciones/simpleamqp"
-	"github.com/jsoriano/goryman"
-)
-
-const (
-	riemannDescriptionMaxLength = 250
 )
 
 // CheckPublisher define the check result Publisher
@@ -65,46 +60,4 @@ func (p RabbitMqPublisher) PublishCheckResult(event Event) {
 	topic := fmt.Sprintf("check.%s.%s", event.Host, service)
 	serialized, _ := json.Marshal(event)
 	p.publisher.Publish(topic, serialized)
-}
-
-// RiemannPublisher object to publish events to a riemann server
-type RiemannPublisher struct {
-	client *goryman.GorymanClient
-}
-
-// NewRiemannPublisher return a publisher to send directly to a riemann instance
-func NewRiemannPublisher(addr string) RiemannPublisher {
-	p := RiemannPublisher{goryman.NewGorymanClient(addr)}
-	return p
-}
-
-// PublishCheckResult return a publisher to send directly to a riemann instance
-func (p RiemannPublisher) PublishCheckResult(event Event) {
-	err := p.client.Connect()
-	if err != nil {
-		log.Println("[error] publishing check", event)
-		return
-	}
-	defer p.client.Close()
-	riemannEvent := goryman.Event{Description: p.normalizeDescriptionLength(event.Description),
-		Host: event.Host,
-		Service: event.Service,
-		State: event.State,
-		Metric: event.Metric,
-		Tags: event.Tags,
-		Attributes: event.Attributes,
-		Ttl: event.TTL}
-
-	err = p.client.SendEvent(&riemannEvent)
-	if err != nil {
-		log.Println("[error] sending check", event)
-		return
-	}
-}
-
-func (p RiemannPublisher) normalizeDescriptionLength(description string) string {
-	if len(description) < riemannDescriptionMaxLength {
-		return description
-	}
-	return description[0:riemannDescriptionMaxLength]
 }

@@ -2,13 +2,13 @@ package gochecks
 
 import (
 	"fmt"
-	"strings"
 	"log"
+	"strings"
 
 	"encoding/json"
 
+	"github.com/aleasoluciones/goryman"
 	"github.com/aleasoluciones/simpleamqp"
-	"github.com/jsoriano/goryman"
 )
 
 const (
@@ -87,13 +87,13 @@ func (p RiemannPublisher) PublishCheckResult(event Event) {
 	}
 	defer p.client.Close()
 	riemannEvent := goryman.Event{Description: p.normalizeDescriptionLength(event.Description),
-		Host: event.Host,
-		Service: event.Service,
-		State: event.State,
-		Metric: event.Metric,
-		Tags: event.Tags,
+		Host:       event.Host,
+		Service:    event.Service,
+		State:      event.State,
+		Metric:     event.Metric,
+		Tags:       event.Tags,
 		Attributes: event.Attributes,
-		Ttl: event.TTL}
+		Ttl:        event.TTL}
 
 	err = p.client.SendEvent(&riemannEvent)
 	if err != nil {

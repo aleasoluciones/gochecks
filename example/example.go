@@ -8,6 +8,7 @@ import (
 
 func main() {
 	checkEngine := gochecks.NewCheckEngine([]gochecks.CheckPublisher{
+		gochecks.NewRiemannPublisher("127.0.0.1:5555"),
 		gochecks.NewLogPublisher(),
 	})
 	period := 5 * time.Second

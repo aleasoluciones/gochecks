@@ -1,7 +1,6 @@
 2017-03-06
 ==========
-* Internal: Remove unused publisher -> Riemann publisher is not used.
-            Also, riemann client library disappeared https://github.com/bigdatadev/goryman disappeared
+* Internal: https://github.com/bigdatadev/goryman disappeared. Change dependency
 
 2016-10-26
 ==========

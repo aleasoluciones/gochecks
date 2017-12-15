@@ -1,3 +1,7 @@
+2017-12-15
+==========
+* Internal: Removed go version 1.6 and 1.7. Added 1.8.x, 1.9.x and master versions
+
 2017-03-06
 ==========
 * Internal: https://github.com/bigdatadev/goryman disappeared. Change dependency

@@ -32,4 +32,4 @@ after_script:
 
 script:
   - make jenkins
-  - cd example; rm -rf example; godep build example.go
+  - cd example; rm -rf example; godep go build example.go

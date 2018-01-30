@@ -1,6 +1,6 @@
 all: test
 
-jenkins: install_dep_tool install_go_linter production_restore_deps test build
+jenkins: install_dep_tool install_go_linter production_restore_deps test
 
 install_dep_tool:
 	go get github.com/tools/godep

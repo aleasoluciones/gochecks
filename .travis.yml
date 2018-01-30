@@ -31,5 +31,5 @@ after_script:
   - docker ps
 
 script:
-  - make all
+  - make jenkins
   - cd example; go build example.go

@@ -26,3 +26,5 @@ _testmain.go
 #Idea files
 .idea
 
+# Exclude vendor directory (godep dependency manager tool)
+vendor

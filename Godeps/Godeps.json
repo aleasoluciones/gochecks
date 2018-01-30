@@ -1,0 +1,94 @@
+{
+	"ImportPath": "github.com/aleasoluciones/gochecks",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/aleasoluciones/goaleasoluciones/scheduledtask",
+			"Rev": "70d408b97bd19730dc5803590e3b7f0bba6167d1"
+		},
+		{
+			"ImportPath": "github.com/aleasoluciones/goryman",
+			"Rev": "e24918912e98dca6455def4dbd02754ae64d9bdc"
+		},
+		{
+			"ImportPath": "github.com/aleasoluciones/goryman/proto",
+			"Rev": "e24918912e98dca6455def4dbd02754ae64d9bdc"
+		},
+		{
+			"ImportPath": "github.com/aleasoluciones/simpleamqp",
+			"Rev": "cfe515aec3df3a10922e14c5650e5267fc32636e"
+		},
+		{
+			"ImportPath": "github.com/davecgh/go-spew/spew",
+			"Comment": "v1.1.0-9-gecdeabc",
+			"Rev": "ecdeabc65495df2dec95d7c4a4c3e021903035e5"
+		},
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.3-50-g9181e3a",
+			"Rev": "9181e3a86a19bacd63e68d43ae8b7b36320d8092"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-195-g83612a5",
+			"Rev": "83612a56d3dd153a94a629cd64925371c9adad78"
+		},
+		{
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "go1.0-cutoff-195-g83612a5",
+			"Rev": "83612a56d3dd153a94a629cd64925371c9adad78"
+		},
+		{
+			"ImportPath": "github.com/pmezard/go-difflib/difflib",
+			"Comment": "v1.0.0",
+			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
+		},
+		{
+			"ImportPath": "github.com/soniah/gosnmp",
+			"Comment": "v1.9-memory-4-gbe22ca7",
+			"Rev": "be22ca71ca88bccb2b078622d6355884a81853e9"
+		},
+		{
+			"ImportPath": "github.com/streadway/amqp",
+			"Rev": "27859d32540aebd2e5befa52dc59ae8e6a0132b6"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.1.4-72-g2aa2c17",
+			"Rev": "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f"
+		},
+		{
+			"ImportPath": "github.com/tatsushid/go-fastping",
+			"Rev": "d7bb493dee3e090e2ffb6914adddf17c1e7c026c"
+		},
+		{
+			"ImportPath": "golang.org/x/net/bpf",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "golang.org/x/net/icmp",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/iana",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/netreflect",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "golang.org/x/net/ipv4",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "golang.org/x/net/ipv6",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		}
+	]
+}

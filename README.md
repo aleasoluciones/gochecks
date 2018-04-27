@@ -60,7 +60,7 @@ AMQP_URL=amqp://<user>:<pass>@<host>/<vhost>
 
 Example:
 ```
-docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpass -d mysql
+docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpass -d mysql:5.5
 export MYSQL_URL=mysql://root:rootpass@localhost/mysql
 
 docker run -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:9.5

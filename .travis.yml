@@ -16,7 +16,7 @@ env:
  - AMQP_URL=amqp://guest:guest@localhost:5673/ MYSQL_URL=mysql://root:rootpass@localhost:3307/mysql POSTGRES_URL=postgres://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable
 
 before_script:
-  - docker run -p 3307:3306 --name mysql -e MYSQL_ROOT_PASSWORD=rootpass -d mysql
+  - docker run -p 3307:3306 --name mysql:5.5 -e MYSQL_ROOT_PASSWORD=rootpass -d mysql
   - docker run -p 5433:5432 --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres:9.5
   - docker run -p 5673:5672 --name rabbitmq -d rabbitmq
   - docker ps

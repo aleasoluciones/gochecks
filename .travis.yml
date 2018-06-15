@@ -33,3 +33,7 @@ after_script:
 script:
   - make jenkins
   - cd example; rm -rf example; godep go build example.go
+
+notifications:
+  email:
+    - bifer@alea-soluciones.com

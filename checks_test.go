@@ -40,7 +40,7 @@ func TestHttpCheckerWithServerDown(t *testing.T) {
 	checkResult := check()
 
 	assert.Equal(t, "critical", checkResult.State)
-	assert.InDelta(t, checkResult.Metric, 0, 100)
+	assert.InDelta(t, checkResult.Metric, 0, 150)
 }
 
 func amqpUrlFromEnv() string {

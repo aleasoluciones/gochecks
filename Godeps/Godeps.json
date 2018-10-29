@@ -1,11 +1,11 @@
 {
 	"ImportPath": "github.com/aleasoluciones/gochecks",
-	"GoVersion": "go1.9",
+	"GoVersion": "go1.11",
 	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/aleasoluciones/goaleasoluciones/scheduledtask",
-			"Rev": "70d408b97bd19730dc5803590e3b7f0bba6167d1"
+			"Rev": "a090d0d5ee9eeeb29cc901e3b456cfb0abdb1506"
 		},
 		{
 			"ImportPath": "github.com/aleasoluciones/goryman",
@@ -21,27 +21,27 @@
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",
-			"Comment": "v1.1.0-9-gecdeabc",
-			"Rev": "ecdeabc65495df2dec95d7c4a4c3e021903035e5"
+			"Comment": "v1.1.0",
+			"Rev": "346938d642f2ec3594ed81d874461961cd0faa76"
 		},
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
-			"Comment": "v1.3-50-g9181e3a",
-			"Rev": "9181e3a86a19bacd63e68d43ae8b7b36320d8092"
+			"Comment": "v1.3-2-g2e00b5c",
+			"Rev": "2e00b5cd70399450106cec6431c2e2ce3cae5034"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
-			"Rev": "1e59b77b52bf8e4b449a57e6f79f21226d571845"
+			"Rev": "c9c7427a2a70d2eb3bafa0ab2dc163e45f143317"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
-			"Comment": "go1.0-cutoff-195-g83612a5",
-			"Rev": "83612a56d3dd153a94a629cd64925371c9adad78"
+			"Comment": "go1.0-cutoff-164-g472a074",
+			"Rev": "472a0745531a17dbac346e828b4c60e73ddff30c"
 		},
 		{
 			"ImportPath": "github.com/lib/pq/oid",
-			"Comment": "go1.0-cutoff-195-g83612a5",
-			"Rev": "83612a56d3dd153a94a629cd64925371c9adad78"
+			"Comment": "go1.0-cutoff-164-g472a074",
+			"Rev": "472a0745531a17dbac346e828b4c60e73ddff30c"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
@@ -50,8 +50,8 @@
 		},
 		{
 			"ImportPath": "github.com/soniah/gosnmp",
-			"Comment": "v1.9-memory-4-gbe22ca7",
-			"Rev": "be22ca71ca88bccb2b078622d6355884a81853e9"
+			"Comment": "v1.9-memory-110-g5ad50dc",
+			"Rev": "5ad50dc75ab389f8a1c9f8a67d3a1cd85f67ed15"
 		},
 		{
 			"ImportPath": "github.com/streadway/amqp",
@@ -59,8 +59,8 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Comment": "v1.1.4-72-g2aa2c17",
-			"Rev": "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f"
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
 		},
 		{
 			"ImportPath": "github.com/tatsushid/go-fastping",
@@ -89,6 +89,16 @@
 		{
 			"ImportPath": "golang.org/x/net/ipv6",
 			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
 		}
 	]
 }

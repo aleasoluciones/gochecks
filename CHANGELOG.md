@@ -1,3 +1,8 @@
+2018-10-29
+==========
+* Internal: Update go version 1.10 and 1.11
+* Internal: Update godep version
+
 2018-01-30
 ==========
 * Internal: Used godep for dependency management tool

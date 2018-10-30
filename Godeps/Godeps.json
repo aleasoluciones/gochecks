@@ -89,20 +89,6 @@
 		{
 			"ImportPath": "golang.org/x/net/ipv6",
 			"Rev": "a6577fac2d73be281a500b310739095313165611"
-		},
-		{
-			"ImportPath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
-			"Comment": "v1.1.4-27-g4d4bfba",
-			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
-		},
-		{
-			"ImportPath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
-			"Comment": "v1.1.4-27-g4d4bfba",
-			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
-		},
-		{
-			"ImportPath": "github.com/aleasoluciones/simpleamqp/vendor/github.com/streadway/amqp",
-			"Rev": "cfe515aec3df3a10922e14c5650e5267fc32636e"
 		}
 	]
 }

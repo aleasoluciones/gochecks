@@ -50,8 +50,8 @@
 		},
 		{
 			"ImportPath": "github.com/soniah/gosnmp",
-			"Comment": "v1.9-memory-110-g5ad50dc",
-			"Rev": "5ad50dc75ab389f8a1c9f8a67d3a1cd85f67ed15"
+			"Comment": "v1.9-memory-4-gbe22ca7",
+			"Rev": "be22ca71ca88bccb2b078622d6355884a81853e9"
 		},
 		{
 			"ImportPath": "github.com/streadway/amqp",

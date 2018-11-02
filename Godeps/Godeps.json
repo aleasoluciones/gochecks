@@ -5,7 +5,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/aleasoluciones/goaleasoluciones/scheduledtask",
-			"Rev": "a090d0d5ee9eeeb29cc901e3b456cfb0abdb1506"
+			"Rev": "ab5dd857b833a98b1f3d0c334831b37b4164ae2f"
 		},
 		{
 			"ImportPath": "github.com/aleasoluciones/goryman",
@@ -17,7 +17,7 @@
 		},
 		{
 			"ImportPath": "github.com/aleasoluciones/simpleamqp",
-			"Rev": "cfe515aec3df3a10922e14c5650e5267fc32636e"
+			"Rev": "be2281293e4c61be7a13a393963b66ad802c7ccf"
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",

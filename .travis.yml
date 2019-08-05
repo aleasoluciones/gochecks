@@ -6,7 +6,6 @@ go:
  - 1.11.x
  - master
 
-
 sudo: false
 
 services:
@@ -14,6 +13,11 @@ services:
 
 env:
  - AMQP_URL=amqp://guest:guest@localhost:5673/ MYSQL_URL=mysql://root:rootpass@localhost:3307/mysql POSTGRES_URL=postgres://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable
+
+# safelist branch to build
+branches:
+  only:
+      - master
 
 before_script:
   - docker run -p 3307:3306 --name mysql -e MYSQL_ROOT_PASSWORD=rootpass -d mysql:5.5

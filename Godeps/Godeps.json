@@ -5,7 +5,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/aleasoluciones/goaleasoluciones/scheduledtask",
-			"Rev": "ab5dd857b833a98b1f3d0c334831b37b4164ae2f"
+			"Rev": "b0f5cadff0cbc918dd386f061e9fa37f0ce73d13"
 		},
 		{
 			"ImportPath": "github.com/aleasoluciones/goryman",

@@ -52,24 +52,15 @@ checkEngine.AddCheck(
 
 ##Development
 
-To pass the integration tests you need to execute a MySQL server, a Postgres server and a RabbitMQ Server and export the corresponding vars:
+To pass the integration tests you need to execute a MySQL server, a Postgres server and a RabbitMQ Server and export the corresponding vars.
 
-MYSQL_URL=mysql://<user>:<pass>@<host>/<database>
-POSTGRES_URL=postgres://<user>:<pass>@<host>/<satabase>
-AMQP_URL=amqp://<user>:<pass>@<host>/<vhost>
+The directory dev/ offers two scripts and an environment file to achieve this easily:
 
-Example:
 ```
-docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=rootpass -d mysql:5.5
-export MYSQL_URL=mysql://root:rootpass@localhost/mysql
-
-docker run -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:9.5
-export POSTGRES_URL=postgres://postgres:mysecretpassword@localhost/postgres?sslmode=disable
-
-docker run -p 5672:5672 -d rabbitmq
-export AMQP_URL=amqp://guest:guest@127.0.0.1:5672/
-
+source dev/env_develop
+dev/start_gochecks_dependencies.sh
 go test -tags integration -v ./...
+dev/stop_gochecks_dependencies.sh
 ```
 
 ##Todo

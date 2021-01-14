@@ -34,6 +34,11 @@
 			"Rev": "c9c7427a2a70d2eb3bafa0ab2dc163e45f143317"
 		},
 		{
+			"ImportPath": "github.com/gosnmp/gosnmp",
+			"Comment": "v1.29.0-7-g8d44276",
+			"Rev": "8d442760d54593e76f748d36c941a98128dc7fdc"
+		},
+		{
 			"ImportPath": "github.com/lib/pq",
 			"Comment": "go1.0-cutoff-164-g472a074",
 			"Rev": "472a0745531a17dbac346e828b4c60e73ddff30c"
@@ -47,11 +52,6 @@
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
 			"Comment": "v1.0.0",
 			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
-		},
-		{
-			"ImportPath": "github.com/soniah/gosnmp",
-			"Comment": "v1.9-memory-4-gbe22ca7",
-			"Rev": "be22ca71ca88bccb2b078622d6355884a81853e9"
 		},
 		{
 			"ImportPath": "github.com/streadway/amqp",

@@ -20,6 +20,7 @@ branches:
       - master
 
 before_script:
+  - echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USER --password-stdin
   - docker run -p 3307:3306 --name mysql -e MYSQL_ROOT_PASSWORD=rootpass -d mysql:5.5
   - docker run -p 5433:5432 --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres:9.5
   - docker run -p 5673:5672 --name rabbitmq -d rabbitmq
@@ -33,6 +34,7 @@ after_script:
   - docker stop rabbitmq
   - docker rm rabbitmq
   - docker ps
+  - docker logout
 
 script:
   - make jenkins

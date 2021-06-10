@@ -24,14 +24,14 @@ It includes:
   * [riemann](http://riemann.io/)
   * RabbitMQ / AMQP
 
-##Install
+## Install
 
 ```
 go get github.com/aleasoluciones/gochecks
 ```
 
 
-##Sample code
+## Sample code
 
 Create a Checks Engine with two publisher (riemman and log)
 ```
@@ -50,7 +50,7 @@ checkEngine.AddCheck(
     20 * time.Second)
 ```
 
-##Development
+## Development
 
 To pass the integration tests you need to execute a MySQL server, a Postgres server and a RabbitMQ Server and export the corresponding vars.
 
@@ -63,5 +63,5 @@ go test -tags integration -v ./...
 dev/stop_gochecks_dependencies.sh
 ```
 
-##Todo
+## Todo
  * Metric for all the checks

@@ -1,6 +1,6 @@
 # gochecks
 
-[![Build Status](https://travis-ci.org/aleasoluciones/gochecks.svg?branch=master)](https://travis-ci.org/aleasoluciones/gochecks)
+[![Build Status](https://travis-ci.com/aleasoluciones/gochecks.svg?branch=master)](https://travis-ci.com/aleasoluciones/gochecks)
 [![GoDoc](https://godoc.org/github.com/aleasoluciones/gochecks?status.png)](http://godoc.org/github.com/aleasoluciones/gochecks)
 
 gochecks package provides utilities to check services health and publish events.

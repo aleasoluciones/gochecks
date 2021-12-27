@@ -1,0 +1,39 @@
+version: "3"
+services:
+  rabbitmq:
+    image: rabbitmq:3.7.4-management
+    network_mode: bridge
+    environment:
+      - RABBITMQ_DEFAULT_USER=${BROKER_USER}
+      - RABBITMQ_DEFAULT_PASS=${BROKER_PASSWORD}
+    ports:
+      - ${BROKER_MANAGEMENT_PORT}:15672
+      - ${BROKER_PORT}:5672
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
+  postgres:
+    image: postgres:13.3
+    network_mode: bridge
+    stop_signal: SIGINT
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+
+  mysql:
+    image: mysql:5.6
+    network_mode: bridge
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - ${MYSQL_PORT}:3306
+    volumes:
+      - /etc/localtime:/etc/localtime:ro

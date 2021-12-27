@@ -1,43 +1,30 @@
-sudo: required
-
-language: go
-go:
- - 1.11.x
- - 1.17.x
-
-sudo: false
-
 services:
   - docker
 
-env:
- - AMQP_URL=amqp://guest:guest@localhost:5673/ MYSQL_URL=mysql://root:rootpass@localhost:3307/mysql POSTGRES_URL=postgres://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable
+os: linux
 
-# safelist branch to build
+dist: focal
+
+language: go
+
+go:
+  - 1.17.x
+
 branches:
   only:
-      - master
+    - master
 
 before_script:
-  - echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USER --password-stdin
-  - docker run -p 3307:3306 --name mysql -e MYSQL_ROOT_PASSWORD=rootpass -d mysql:5.5
-  - docker run -p 5433:5432 --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres:9.5
-  - docker run -p 5673:5672 --name rabbitmq -d rabbitmq
-  - docker ps
-
-after_script:
-  - docker stop mysql
-  - docker rm mysql
-  - docker stop postgres
-  - docker rm postgres
-  - docker stop rabbitmq
-  - docker rm rabbitmq
-  - docker ps
-  - docker logout
+  - source dev/env_develop
+  - make start_dependencies
+  - sleep 15
 
 script:
-  - make jenkins
-  - cd example; rm -rf example; godep go build example.go
+  - make test
+  - make build
+
+after_script:
+  - make rm_dependencies
 
 notifications:
   email:

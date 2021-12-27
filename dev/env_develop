@@ -1,3 +1,19 @@
-export MYSQL_URL=mysql://root:rootpass@127.0.0.1/mysql
-export POSTGRES_URL=postgres://postgres:mysecretpassword@127.0.0.1/postgres?sslmode=disable
-export AMQP_URL=amqp://guest:guest@127.0.0.1:5672/
+echo "DEVELOP enviroment"
+
+export BROKER_USER=guest
+export BROKER_PASSWORD=guest
+export BROKER_PORT=5664
+export BROKER_MANAGEMENT_PORT=15664
+export BROKER_URI=amqp://${BROKER_USER}:${BROKER_PASSWORD}@localhost:${BROKER_PORT}/
+
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=postgres
+export POSTGRES_DB=postgres
+export POSTGRES_PORT=3314
+export POSTGRES_URI=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable
+
+export MYSQL_USER=postgres
+export MYSQL_PASSWORD=postgres
+export MYSQL_DB=postgres
+export MYSQL_PORT=5404
+export MYSQL_URI=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@localhost:${MYSQL_PORT}/${MYSQL_DB}

@@ -1,31 +1,35 @@
-all: test
+all: clean test build
 
-jenkins: install_dep_tool install_go_linter production_restore_deps test
+update_dep:
+	go get $(DEP)
+	go mod tidy
 
-install_dep_tool:
-	go get github.com/tools/godep
+update_all_deps:
+	go get -u
+	go mod tidy
 
-install_go_linter:
-	go get -u -v golang.org/x/lint/golint
-
-initialize_deps:
-	go get -d -v ./...
-	go get -d -v github.com/stretchr/testify/assert
-	go get -v golang.org/x/lint/golint
-	godep save
-
-update_deps:
-	godep go install -v ./...
-	godep go install -v github.com/stretchr/testify/assert
-	godep go install -v golang.org/x/lint/golint
-	godep update ./...
+format:
+	go fmt ./...
 
 test:
-	golint ./...
-	godep go vet ./...
-	godep go test -tags integration ./...
+	go vet ./...
+	go clean -testcache
+	go test -tags integration ./... -timeout 60s
 
-production_restore_deps:
-	godep restore
+build:
+	go build -o changeme example/example.go
 
-.PHONY: all jenkins install_dep_tool install_go_linter initialize_deps update_deps test production_restore_deps
+clean:
+	rm -f changeme
+
+start_dependencies:
+	docker-compose -f dev/gochecks_devdocker/docker-compose.yml up -d
+
+stop_dependencies:
+	docker-compose -f dev/gochecks_devdocker/docker-compose.yml stop
+
+rm_dependencies:
+	docker-compose -f dev/gochecks_devdocker/docker-compose.yml down -v
+
+
+.PHONY: all update_dep update_all_deps format test build clean start_dependencies stop_dependencies rm_dependencies

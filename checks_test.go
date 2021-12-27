@@ -44,7 +44,7 @@ func TestHttpCheckerWithServerDown(t *testing.T) {
 }
 
 func amqpUrlFromEnv() string {
-	url := os.Getenv("AMQP_URL")
+	url := os.Getenv("BROKER_URI")
 	if url == "" {
 		url = "amqp://"
 	}
@@ -176,7 +176,7 @@ func TestMysqlConnectionErrorCheck(t *testing.T) {
 
 func TestMysqlConnectionOkCheck(t *testing.T) {
 	t.Parallel()
-	check := NewMysqlConnectionCheck("host", "service", os.Getenv("MYSQL_URL"))
+	check := NewMysqlConnectionCheck("host", "service", os.Getenv("MYSQL_URI"))
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)
@@ -195,7 +195,7 @@ func TestPostgresConnectionErrorCheck(t *testing.T) {
 func TestPostgresOkCheck(t *testing.T) {
 	t.Parallel()
 
-	check := NewPostgresConnectionCheck("host", "service", os.Getenv("POSTGRES_URL"))
+	check := NewPostgresConnectionCheck("host", "service", os.Getenv("POSTGRES_URI"))
 	checkResult := check()
 
 	assert.Equal(t, "ok", checkResult.State)

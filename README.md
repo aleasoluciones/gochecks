@@ -22,8 +22,7 @@ It includes:
    * Jenkins jobs status
 
  * Publishers:
-  * [riemann](http://riemann.io/)
-  * RabbitMQ / AMQP
+   * RabbitMQ / AMQP
 
 ## Install
 
@@ -34,10 +33,10 @@ go get github.com/aleasoluciones/gochecks
 
 ## Sample code
 
-Create a Checks Engine with two publisher (riemman and log)
+Create a Checks Engine with two publisher (rabbit and log)
 ```
 checkEngine := gochecks.NewCheckEngine([]gochecks.CheckPublisher{
-    gochecks.NewRiemannPublisher("127.0.0.1:5555"),
+    gochecks.RabbitMqPublisher("amqp://localhost", "events"),
     gochecks.NewLogPublisher(),
 })
 ```

@@ -3,8 +3,8 @@ module github.com/aleasoluciones/gochecks
 go 1.17
 
 require (
-	github.com/aleasoluciones/goaleasoluciones v0.0.0-20220113113527-3ed1680c9b43
-	github.com/aleasoluciones/simpleamqp v0.0.0-20211227071525-76f2c32002ba
+	github.com/aleasoluciones/goaleasoluciones v0.0.0-20220218070719-a99a7ffe0d1b
+	github.com/aleasoluciones/simpleamqp v0.0.0-20220218070933-a0ca3be9bd5d
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gosnmp/gosnmp v1.34.0
 	github.com/lib/pq v1.10.4

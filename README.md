@@ -1,6 +1,6 @@
 # gochecks
 
-[![Build Status](https://travis-ci.com/aleasoluciones/gochecks.svg?branch=master)](https://travis-ci.com/aleasoluciones/gochecks)
+[![CI](https://github.com/aleasoluciones/gochecks/actions/workflows/ci.yml/badge.svg)](https://github.com/aleasoluciones/gochecks/actions/workflows/ci.yml)
 [![GoDoc](https://godoc.org/github.com/aleasoluciones/gochecks?status.png)](http://godoc.org/github.com/aleasoluciones/gochecks)
 [![License](https://img.shields.io/github/license/aleasoluciones/http2amqp)](https://github.com/aleasoluciones/http2amqp/blob/master/LICENSE)
 

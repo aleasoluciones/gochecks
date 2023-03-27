@@ -8,6 +8,12 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    env:
+      BROKER_URI: amqp://guest:guest@localhost:5664/
+      POSTGRES_URI: postgres://postgres:postgres@localhost:3314/postgres?sslmode=disable
+      MYSQL_URI: mysql://postgres:postgres@localhost:5404/postgres
+
     steps:
       - uses: actions/checkout@v3
 
